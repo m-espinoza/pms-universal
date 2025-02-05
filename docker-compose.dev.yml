@@ -1,0 +1,45 @@
+services:
+
+  web:
+    container_name: web_pms
+    build: ./docker/django
+    env_file:
+      - ./.env
+    volumes:
+      - ./public/:/home/public
+    ports:
+      - ${SYSTEM_PORT}:8000
+
+    command: sh -c "python ./pms/manage.py runserver 0:8000"
+    
+    depends_on:
+      - db
+    networks:
+      - red-interna-pms
+    
+
+  db:
+    container_name: db_pms
+    env_file:
+      - ./.env
+    image: postgres:${POSTGRES_VERSION}
+    ports:
+      - ${DB_PORT}:5432
+    environment:
+      POSTGRES_PASSWORD: ${PASS}
+      POSTGRES_DB: ${DATABASE}
+      TZ: ${TZ}
+      PGTZ: ${TZ}
+    restart: always 
+    volumes:
+      - db-data-pms:/var/lib/postgresql/data
+    networks:
+      - red-interna-pms
+
+
+networks:
+    red-interna-pms:
+        driver: bridge
+
+volumes:
+  db-data-pms:
