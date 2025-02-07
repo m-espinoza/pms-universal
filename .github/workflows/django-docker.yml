@@ -25,6 +25,13 @@ jobs:
         docker-compose --version
 
     - name: Build and start containers
+      env:
+        SYSTEM_PORT: ${{ secrets.SYSTEM_PORT }}
+        POSTGRES_VERSION: ${{ secrets.POSTGRES_VERSION }}
+        DB_PORT: ${{ secrets.DB_PORT }}
+        PASS: ${{ secrets.PASS }}
+        DATABASE: ${{ secrets.DATABASE }}
+        TZ: ${{ secrets.TZ }}
       run: |
         docker-compose -f docker-compose.dev.yml up -d
 
