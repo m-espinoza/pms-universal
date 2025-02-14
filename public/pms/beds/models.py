@@ -15,13 +15,13 @@ class Room(models.Model):
     )
 
     room_type = models.CharField(
-        max_length=7, 
+        max_length=7,
         choices=ROOM_TYPES,
         verbose_name=_('room type')
     )
 
     base_price = models.DecimalField(
-        max_digits=10, 
+        max_digits=10,
         decimal_places=2,
         default=0.00,
         verbose_name=_('base price')
@@ -32,12 +32,12 @@ class Room(models.Model):
         blank=True,
         default=1
     )
-    
+
     description = models.TextField(
         blank=True,
         verbose_name=_('description'),
         help_text=_('Room description (private bathroom, amenities, etc.')
-    )    
+    )
 
     is_active = models.BooleanField(
         default=True,
@@ -71,7 +71,7 @@ class Bed(models.Model):
     )
 
     bed_type = models.CharField(
-        max_length=11, 
+        max_length=11,
         choices=BED_TYPES,
         verbose_name=_('bed type'),
         default='SINGLE',
@@ -85,7 +85,7 @@ class Bed(models.Model):
     )
 
     base_price = models.DecimalField(
-        max_digits=10, 
+        max_digits=10,
         decimal_places=2,
         default=0.00,
         verbose_name=_('base price')
