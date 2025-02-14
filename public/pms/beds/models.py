@@ -1,86 +1,106 @@
 from django.db import models
-from django.core.validators import MinValueValidator, DecimalValidator
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
 class Room(models.Model):
-    name = models.CharField(max_length=50, verbose_name="Nombre de la habitación")
-    description = models.TextField(
-        verbose_name="Descripción",
-        help_text="Características de la habitación (baño privado, amenities, etc.)"
+    ROOM_TYPES = [
+        ('DORM', _('Dormitory')),
+        ('PRIVATE', _('Private Room')),
+    ]
+
+    name = models.CharField(
+        max_length=50,
+        verbose_name=_('name'),
+        help_text=_('Room name should be unique')
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
-    class Meta:
-        verbose_name = "Habitación"
-        verbose_name_plural = "Habitaciones"
-        ordering = ['name']
+    room_type = models.CharField(
+        max_length=7,
+        choices=ROOM_TYPES,
+        verbose_name=_('room type')
+    )
 
-    def __str__(self):
-        return self.name
-
-class BedCategory(models.Model):
-    name = models.CharField(max_length=50, verbose_name="Nombre de la categoría")
-    price_per_night = models.DecimalField(
+    base_price = models.DecimalField(
         max_digits=10,
         decimal_places=2,
-        validators=[MinValueValidator(0)],
-        verbose_name="Precio por noche"
+        default=0.00,
+        verbose_name=_('base price')
     )
+
+    capacity = models.IntegerField(
+        verbose_name=_('capacity'),
+        blank=True,
+        default=1
+    )
+
     description = models.TextField(
-        verbose_name="Descripción",
-        help_text="Incluir dimensiones y características de la cama"
+        blank=True,
+        verbose_name=_('description'),
+        help_text=_('Room description (private bathroom, amenities, etc.')
     )
+
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name=_('is active')
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
+
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = "Categoría de cama"
-        verbose_name_plural = "Categorías de camas"
+        verbose_name = _('room')
+        verbose_name_plural = _('rooms')
         ordering = ['name']
 
     def __str__(self):
-        return f"{self.name} - ${self.price_per_night}/noche"
+        return f"{_('Room')} {self.number} ({self.get_room_type_display()})"
 
 class Bed(models.Model):
-    STATES = [
-        ('enabled', 'Habilitada'),
-        ('disabled', 'Deshabilitada'),
-        ('maintenance', 'En Mantenimiento'),
+    BED_TYPES = [
+        ('SINGLE', _('Single Bed')),
+        ('BUNK_TOP', _('Top Bunk')),
+        ('BUNK_BOTTOM', _('Bottom Bunk')),
+        ('DOUBLE', _('Double Bed')),
     ]
-    
-    name = models.CharField(max_length=50, verbose_name="Nombre de la cama")
-    bed_number = models.CharField(max_length=10, verbose_name="Número de cama")
+
+    number = models.IntegerField(
+        verbose_name=_('number'),
+        null=True,
+        blank=True,
+    )
+
+    bed_type = models.CharField(
+        max_length=11,
+        choices=BED_TYPES,
+        verbose_name=_('bed type'),
+        default='SINGLE',
+    )
+
     room = models.ForeignKey(
         Room,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         related_name='beds',
-        verbose_name="Habitación"
+        verbose_name=_('room')
     )
-    category = models.ForeignKey(
-        BedCategory,
-        on_delete=models.PROTECT,
-        related_name='beds',
-        verbose_name="Categoría"
-    )
-    capacity = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1)],
-        default=1,
-        verbose_name="Capacidad de personas"
-    )
-    status = models.CharField(
-        max_length=20,
-        choices=STATES,
-        default='enabled',
-        verbose_name="Estado"
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    class Meta:
-        verbose_name = "Cama"
-        verbose_name_plural = "Camas"
-        ordering = ['room', 'bed_number']
-        unique_together = ['room', 'bed_number']
 
-    def __str__(self):
-        return f"{self.room} - Cama {self.bed_number} ({self.category.name})"
+    base_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0.00,
+        verbose_name=_('base price')
+    )
+
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name=_('is active')
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _('bed')
+        verbose_name_plural = _('beds')
+        unique_together = ['room', 'number']
