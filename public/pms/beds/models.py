@@ -31,7 +31,8 @@ class Room(models.Model):
         verbose_name=_('capacity'),
         blank=True,
         default=1
-        )
+    )
+    
     description = models.TextField(
         blank=True,
         verbose_name=_('description'),
