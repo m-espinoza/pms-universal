@@ -54,7 +54,7 @@ class Room(models.Model):
         ordering = ['name']
 
     def __str__(self):
-        return f"{_('Room')} {self.number} ({self.get_room_type_display()})"
+        return f"{_('Room')} {self.name} ({self.get_room_type_display()})"
 
 class Bed(models.Model):
     BED_TYPES = [
