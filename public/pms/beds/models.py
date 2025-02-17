@@ -20,13 +20,6 @@ class Room(models.Model):
         verbose_name=_('room type')
     )
 
-    base_price = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        default=0.00,
-        verbose_name=_('base price')
-    )
-
     capacity = models.IntegerField(
         verbose_name=_('capacity'),
         blank=True,
