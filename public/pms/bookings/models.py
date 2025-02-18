@@ -34,7 +34,7 @@ class Booking(models.Model):
     check_out_date = models.DateField(verbose_name=_('check-out date'))
 
     status = models.CharField(
-        max_length=10,
+        max_length=11,
         choices=STATUS_CHOICES,
         default='PENDING',
         verbose_name=_('status')
