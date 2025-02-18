@@ -7,7 +7,7 @@ class GuestAdmin(admin.ModelAdmin):
     list_filter = ('name', 'nationality')
     search_fields = ('name', 'phone_number', 'email', 'nationality')
     date_hierarchy = 'created_at'
-    ordering = ('created_at',)
+    ordering = ('-created_at',)
     fieldsets = (
         (None, {
             'fields': ('name', 'phone_number ', 'email', 'nationality')
