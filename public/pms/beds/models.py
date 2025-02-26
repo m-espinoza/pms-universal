@@ -11,7 +11,8 @@ class Room(models.Model):
     name = models.CharField(
         max_length=50,
         verbose_name=_('name'),
-        help_text=_('Room name should be unique')
+        help_text=_('Room name should be unique'),
+        unique=True
     )
 
     room_type = models.CharField(
