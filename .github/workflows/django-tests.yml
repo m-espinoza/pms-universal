@@ -49,3 +49,4 @@ jobs:
         DATABASE: ${{ secrets.DATABASE }}
         USER: ${{ secrets.USER }}
         PASS: ${{ secrets.PASS }}
+        TZ: ${{ secrets.TZ }}
