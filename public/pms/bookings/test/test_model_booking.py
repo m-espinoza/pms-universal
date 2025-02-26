@@ -11,7 +11,9 @@ class BookingModelTest(TestCase):
     def setUp(self):
         # Configuración común para las pruebas
         self.room = Room.objects.create(name="Room 101", room_type="PRIVATE")
-        self.bed = Bed.objects.create(number=1, bed_type="SINGLE", room=self.room)
+        self.bed = Bed.objects.create(
+            number=1, bed_type="SINGLE", room=self.room
+        )
         self.guest = Guest.objects.create(
             name="John Doe", document_type="DNI", document_number="12345678"
         )
@@ -33,7 +35,7 @@ class BookingModelTest(TestCase):
                 guest=self.guest,
                 bed=self.bed,
                 check_in_date=date.today(),
-                check_out_date=date.today() - timedelta(days=1),  # Fecha inválida
+                check_out_date=date.today() - timedelta(days=1),
             )
             booking.full_clean()
 
