@@ -45,7 +45,7 @@ jobs:
       env:
         DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
         DB_PORT: ${{ secrets.DB_PORT }}
-        DB_HOST: ${{ secrets.HOST }}
-        DB_NAME: ${{ secrets.DATABASE }}
-        DB_USER: ${{ secrets.USER }}
-        DB_PASSWORD: ${{ secrets.PASS }}
+        HOST: ${{ secrets.HOST }}
+        DATABASE: ${{ secrets.DATABASE }}
+        USER: ${{ secrets.USER }}
+        PASS: ${{ secrets.PASS }}
