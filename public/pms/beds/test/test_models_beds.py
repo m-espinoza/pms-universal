@@ -8,9 +8,7 @@ class BedModelTest(TestCase):
         # Configuración común para las pruebas
         self.room = Room.objects.create(name="Room 101", room_type="PRIVATE")
         self.bed = Bed.objects.create(
-            number=1,
-            bed_type="SINGLE",
-            room=self.room
+            number=1, bed_type="SINGLE", room=self.room
         )
 
     def test_create_bed(self):
