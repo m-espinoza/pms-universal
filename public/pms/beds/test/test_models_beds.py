@@ -2,11 +2,16 @@ from django.test import TestCase
 from beds.models import Room, Bed
 from django.core.exceptions import ValidationError
 
+
 class BedModelTest(TestCase):
     def setUp(self):
         # Configuración común para las pruebas
         self.room = Room.objects.create(name="Room 101", room_type="PRIVATE")
-        self.bed = Bed.objects.create(number=1, bed_type="SINGLE", room=self.room)
+        self.bed = Bed.objects.create(
+            number=1,
+            bed_type="SINGLE",
+            room=self.room
+        )
 
     def test_create_bed(self):
         self.assertEqual(self.bed.number, 1)
@@ -30,3 +35,4 @@ class BedModelTest(TestCase):
         self.bed.delete()
         with self.assertRaises(Bed.DoesNotExist):
             Bed.objects.get(id=bed_id)
+            
