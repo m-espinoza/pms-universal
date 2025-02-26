@@ -1,4 +1,4 @@
-from beds.models import Room, Bed
+from beds.models import Bed, Room
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
