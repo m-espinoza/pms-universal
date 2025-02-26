@@ -11,9 +11,7 @@ class BookingModelTest(TestCase):
     def setUp(self):
         # Configuración común para las pruebas
         self.room = Room.objects.create(name="Room 101", room_type="PRIVATE")
-        self.bed = Bed.objects.create(
-            number=1, bed_type="SINGLE", room=self.room
-        )
+        self.bed = Bed.objects.create(number=1, bed_type="SINGLE", room=self.room) # noqa
         self.guest = Guest.objects.create(
             name="John Doe", document_type="DNI", document_number="12345678"
         )
@@ -63,8 +61,6 @@ class BookingModelTest(TestCase):
 
     def test_booking_total_price_calculation(self):
         # Verificar el cálculo del precio total
-        nights = (
-            self.booking.check_out_date - self.booking.check_in_date
-        ).days
+        nights = (self.booking.check_out_date - self.booking.check_in_date).days # noqa
         expected_price = self.bed.base_price * nights
         self.assertEqual(self.booking.total_price, expected_price)
