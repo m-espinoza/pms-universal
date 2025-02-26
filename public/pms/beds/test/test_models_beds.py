@@ -35,4 +35,3 @@ class BedModelTest(TestCase):
         self.bed.delete()
         with self.assertRaises(Bed.DoesNotExist):
             Bed.objects.get(id=bed_id)
-            
