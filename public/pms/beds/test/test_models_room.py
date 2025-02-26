@@ -1,6 +1,7 @@
-from django.test import TestCase
 from beds.models import Room
 from django.core.exceptions import ValidationError
+from django.test import TestCase
+
 
 class RoomModelTest(TestCase):
     def setUp(self):
@@ -9,7 +10,7 @@ class RoomModelTest(TestCase):
             name="Room 101",
             room_type="PRIVATE",
             capacity=2,
-            description="A nice private room."
+            description="A nice private room.",
         )
 
     def test_create_room(self):
