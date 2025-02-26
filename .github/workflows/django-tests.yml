@@ -16,11 +16,12 @@ jobs:
             
     services:
         postgres:
-            image: postgres:15
+            image: postgres:14
             env:
                 POSTGRES_PASSWORD: ${{ secrets.PASS }}
-                POSTGRES_USER: ${{ secrets.USER }}
                 POSTGRES_DB: ${{ secrets.DATABASE }}
+                TZ: 'America/Argentina/Mendoza'
+                PGTZ: 'America/Argentina/Mendoza'
             ports:
                 - 5432:5432
             options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
@@ -49,4 +50,4 @@ jobs:
         DATABASE: ${{ secrets.DATABASE }}
         USER: ${{ secrets.USER }}
         PASS: ${{ secrets.PASS }}
-        TZ: ${{ secrets.TZ }}
+        TZ: 'America/Argentina/Mendoza'
