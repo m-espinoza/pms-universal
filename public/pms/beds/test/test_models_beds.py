@@ -7,9 +7,7 @@ class BedModelTest(TestCase):
     def setUp(self):
         # Configuración común para las pruebas
         self.room = Room.objects.create(name="Room 101", room_type="PRIVATE")
-        self.bed = Bed.objects.create(
-            number=1, bed_type="SINGLE", room=self.room
-        )
+        self.bed = Bed.objects.create(number=1, bed_type="SINGLE", room=self.room) # noqa
 
     def test_create_bed(self):
         self.assertEqual(self.bed.number, 1)
