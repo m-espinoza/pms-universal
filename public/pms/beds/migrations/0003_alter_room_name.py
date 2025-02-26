@@ -13,6 +13,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='room',
             name='name',
-            field=models.CharField(help_text='Room name should be unique', max_length=50, unique=True, verbose_name='name'),
+            field=models.CharField(
+                help_text='Room name should be unique',
+                max_length=50,
+                unique=True,
+                verbose_name='name'
+                ),
         ),
     ]
