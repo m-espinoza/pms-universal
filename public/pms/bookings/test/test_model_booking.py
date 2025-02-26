@@ -53,11 +53,16 @@ class BookingModelTest(TestCase):
 
     def test_booking_str_method(self):
         # Verificar el método __str__
-        expected_str = f"{self.guest} - {self.bed} ({self.booking.check_in_date} to {self.booking.check_out_date})"
+        expected_str = (
+            f"{self.guest} - {self.bed} "
+            f"({self.booking.check_in_date} to {self.booking.check_out_date})"
+        )
         self.assertEqual(str(self.booking), expected_str)
 
     def test_booking_total_price_calculation(self):
         # Verificar el cálculo del precio total
-        nights = (self.booking.check_out_date - self.booking.check_in_date).days
+        nights = (
+            self.booking.check_out_date - self.booking.check_in_date
+        ).days
         expected_price = self.bed.base_price * nights
         self.assertEqual(self.booking.total_price, expected_price)
