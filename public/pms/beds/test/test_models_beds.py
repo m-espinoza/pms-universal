@@ -2,6 +2,7 @@ from beds.models import Room, Bed
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
+
 class BedModelTest(TestCase):
     def setUp(self):
         # Configuración común para las pruebas
