@@ -54,8 +54,7 @@ jobs:
         python manage.py test
       env:
         DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
-        DB_PORT: ${{ secrets.DB_PORT }}
-        DB_HOST: 'localhost'
+        HOST: localhost
         DATABASE: ${{ secrets.DATABASE }}
         USER: ${{ secrets.USER }}
         PASS: ${{ secrets.PASS }}
