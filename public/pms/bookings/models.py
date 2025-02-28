@@ -73,8 +73,10 @@ class Booking(models.Model):
         if self.check_in_date >= self.check_out_date:
             raise ValidationError(
                 {
-                    "check_in_date": _("Check-in date must be before check-out date")
-                }  # noqa
+                    "check_in_date": _(
+                        "Check-in date must be before check-out date"
+                    )  # noqa
+                }
             )
 
         # Validar que check_in no sea en el pasado
