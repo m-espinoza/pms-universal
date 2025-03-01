@@ -70,7 +70,7 @@ class Payment(models.Model):
         ordering = ["-payment_date"]
 
     def __str__(self):
-        return f"Pago {self.id} - Reserva {self.booking.id} - {self.amount} €"
+        return f"Pago {self.id} - Reserva {self.booking.id} - $ {self.amount}"
 
     def mark_as_completed(self):
         """Marca el pago como completado."""
