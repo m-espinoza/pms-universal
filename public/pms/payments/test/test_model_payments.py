@@ -1,15 +1,15 @@
 import datetime
 from decimal import Decimal
 
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
-from django.contrib.auth.models import User
 
 from beds.models import Bed, Room
 from bookings.models import Booking
 from guests.models import Guest
-from payments.models import Payment, CashRegisterEntry
+from payments.models import CashRegisterEntry, Payment
 
 
 class PaymentModelTest(TestCase):
@@ -133,7 +133,9 @@ class PaymentModelTest(TestCase):
         self.assertEqual(self.booking.get_payment_status(), "FULLY_PAID")
 
     def test_pending_payments_not_counted(self):
-        """Verificar que los pagos pendientes no se cuentan en el estado de pago."""
+        """
+        Verificar que los pagos pendientes no se cuentan en el estado de pago.
+        """
         # Creamos un pago pendiente
         payment = Payment.objects.create(
             booking=self.booking,
@@ -155,7 +157,9 @@ class PaymentModelTest(TestCase):
         self.assertEqual(self.booking.get_payment_status(), "FULLY_PAID")
 
     def test_payment_exceeding_debt(self):
-        """Verificar que no se pueden crear pagos que excedan la deuda pendiente."""
+        """
+        Verificar que no se pueden crear pagos que excedan la deuda pendiente.
+        """
         # Crear un pago parcial
         Payment.objects.create(
             booking=self.booking,
@@ -218,7 +222,10 @@ class PaymentModelTest(TestCase):
             payment.full_clean()
 
     def test_very_small_payment_amount(self):
-        """Verificar que no se pueden crear pagos con montos extremadamente pequeños."""
+        """
+        Verificar que no se pueden crear pagos
+        con montos extremadamente pequeños.
+        """
         with self.assertRaises(ValidationError):
             payment = Payment(
                 booking=self.booking,
@@ -230,7 +237,10 @@ class PaymentModelTest(TestCase):
             payment.full_clean()
 
     def test_saving_invalid_payment_fails(self):
-        """Verificar que el guardado de un pago inválido falla a nivel de base de datos."""
+        """
+        Verificar que el guardado de un pago
+        inválido falla a nivel de base de datos.
+        """
         # Intentamos crear directamente un pago con monto cero
         # Nota: Esto intentará saltarse las validaciones del modelo,
         # pero debería fallar a nivel de base de datos
@@ -245,8 +255,10 @@ class PaymentModelTest(TestCase):
             )
 
     def test_cash_register_entry_creation(self):
-        """Verificar que se crea una entrada en la caja
-        cuando se marca un pago en efectivo como completado."""
+        """
+        Verificar que se crea una entrada en la caja
+        cuando se marca un pago en efectivo como completado.
+        """
         payment = Payment.objects.create(
             booking=self.booking,
             amount=Decimal("30.00"),
@@ -260,11 +272,15 @@ class PaymentModelTest(TestCase):
         self.assertIsNotNone(entry)
         self.assertEqual(entry.entry_type, "DEPOSIT")
         self.assertEqual(entry.amount, Decimal("30.00"))
-        self.assertEqual(entry.description, f"Pago en efectivo de reserva #{self.booking.id}")
+        self.assertEqual(
+            entry.description, f"Pago en efectivo de reserva #{self.booking.id}"  # noqa
+        )
 
     def test_cash_register_entry_on_refund(self):
-        """Verificar que se crea una entrada en la caja
-        cuando se realiza un reembolso en efectivo."""
+        """
+        Verificar que se crea una entrada en la caja
+        cuando se realiza un reembolso en efectivo.
+        """
         payment = Payment.objects.create(
             booking=self.booking,
             amount=Decimal("30.00"),
@@ -277,7 +293,12 @@ class PaymentModelTest(TestCase):
         payment.refund(amount=Decimal("10.00"), user=self.user)
 
         # Verificar que se creó una entrada en la caja para el reembolso
-        entry = CashRegisterEntry.objects.filter(payment=payment, entry_type="WITHDRAWAL").first()
+        entry = CashRegisterEntry.objects.filter(
+            payment=payment, entry_type="WITHDRAWAL"
+        ).first()
         self.assertIsNotNone(entry)
         self.assertEqual(entry.amount, Decimal("10.00"))
-        self.assertEqual(entry.description, f"Reembolso en efectivo de reserva #{self.booking.id}")
+        self.assertEqual(
+            entry.description,
+            f"Reembolso en efectivo de reserva #{self.booking.id}",  # noqa
+        )
