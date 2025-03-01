@@ -1,10 +1,11 @@
 from datetime import date
 
-from beds.models import Bed
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.utils.translation import gettext_lazy as _
+
+from beds.models import Bed
 from guests.models import Guest
 
 
@@ -151,3 +152,28 @@ class Booking(models.Model):
             )
         self.status = "CANCELLED"
         self.save()
+
+    def get_payment_status(self):
+        """
+        Determina el estado de pago de la reserva.
+
+        Returns:
+            str: Estado de pago: 'NO_PAYMENT' (sin pagos),
+                'PARTIAL_PAYMENT' (pagos parciales),
+                o 'FULLY_PAID' (pagado completamente)
+        """
+
+        # Obtenemos la suma de todos los pagos completados
+        payments_sum = (
+            self.payments.filter(status="COMPLETED").aggregate(total=Sum("amount"))[
+                "total"
+            ]
+            or 0
+        )
+
+        if payments_sum == 0:
+            return "NO_PAYMENT"  # No hay pagos
+        elif payments_sum < self.total_price:
+            return "PARTIAL_PAYMENT"  # Pago parcial
+        else:
+            return "FULLY_PAID"  # Completamente pagado
