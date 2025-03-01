@@ -65,6 +65,17 @@ class Payment(models.Model):
     )
     notes = models.TextField(_("Notas"), blank=True, null=True)
 
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        verbose_name=_("Creado por"),
+        null=True,
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    updated_at = models.DateTimeField(auto_now=True)
+
     class Meta:
         verbose_name = _("Pago")
         verbose_name_plural = _("Pagos")
@@ -73,7 +84,7 @@ class Payment(models.Model):
     def __str__(self):
         return f"Pago {self.id} - Reserva {self.booking.id} - $ {self.amount}"
 
-    def mark_as_completed(self):
+    def mark_as_completed(self, user):
         """Marca el pago como completado."""
         self.status = "COMPLETED"
         self.save()
@@ -84,11 +95,6 @@ class Payment(models.Model):
                 payment=self,
                 entry_type="DEPOSIT",
                 amount=self.amount,
-                created_by=(
-                    self.booking.created_by
-                    if hasattr(self.booking, "created_by")
-                    else None
-                ),
                 description=f"Pago en efectivo de reserva #{self.booking.id}",
             )
 
@@ -124,7 +130,6 @@ class Payment(models.Model):
                 payment=self,
                 entry_type="WITHDRAWAL",
                 amount=refund_amount,
-                created_by=user,
                 description=f"Reembolso en efectivo de reserva #{self.booking.id}",  # noqa
             )
 
@@ -179,56 +184,8 @@ class Payment(models.Model):
                 payment=self,
                 entry_type="DEPOSIT",
                 amount=self.amount,
-                created_by=(
-                    self.booking.created_by
-                    if hasattr(self.booking, "created_by")
-                    else None
-                ),
                 description=f"Pago en efectivo de reserva #{self.booking.id}",
             )
-
-
-class CashRegister(models.Model):
-    """Modelo para gestionar la caja del hostel."""
-
-    name = models.CharField(verbose_name=_("Nombre"), max_length=100)
-    description = models.TextField(
-        verbose_name=_("Descripción"), blank=True, null=True
-    )  # noqa
-    is_active = models.BooleanField(verbose_name=_("Activa"), default=True)
-    created_at = models.DateTimeField(
-        verbose_name=_("Fecha de creación"), auto_now_add=True
-    )
-    updated_at = models.DateTimeField(
-        verbose_name=_("Fecha de actualización"), auto_now=True
-    )
-
-    class Meta:
-        verbose_name = _("Caja")
-        verbose_name_plural = _("Cajas")
-        ordering = ["name"]
-
-    def __str__(self):
-        return self.name
-
-    @property
-    def current_balance(self):
-        """Calcula el saldo actual de la caja."""
-        deposits = (
-            CashRegisterEntry.objects.filter(
-                cash_register=self, entry_type="DEPOSIT"
-            ).aggregate(total=Sum("amount"))["total"]
-            or 0
-        )
-
-        withdrawals = (
-            CashRegisterEntry.objects.filter(
-                cash_register=self, entry_type="WITHDRAWAL"
-            ).aggregate(total=Sum("amount"))["total"]
-            or 0
-        )
-
-        return deposits - withdrawals
 
 
 class CashRegisterEntry(models.Model):
@@ -239,13 +196,6 @@ class CashRegisterEntry(models.Model):
         ("WITHDRAWAL", _("Retiro")),
     ]
 
-    cash_register = models.ForeignKey(
-        CashRegister,
-        on_delete=models.CASCADE,
-        related_name="entries",
-        verbose_name=_("Caja"),
-        default=1,  # Se asume que habrá al menos una caja por defecto
-    )
     payment = models.ForeignKey(
         Payment,
         on_delete=models.SET_NULL,
@@ -266,16 +216,10 @@ class CashRegisterEntry(models.Model):
         validators=[MinValueValidator(0.01)],
     )
     description = models.TextField(verbose_name=_("Descripción"))
-    created_at = models.DateTimeField(
-        verbose_name=_("Fecha de creación"), auto_now_add=True
-    )
-    created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        related_name="cash_entries",
-        verbose_name=_("Creado por"),
-        null=True,
-    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = _("Movimiento de caja")
@@ -291,7 +235,7 @@ class CashRegisterEntry(models.Model):
     def clean(self):
         """Valida que haya suficiente saldo para retiros."""
         if self.entry_type == "WITHDRAWAL" and not self.pk:
-            current_balance = self.cash_register.current_balance
+            current_balance = self.get_current_balance()
             if self.amount > current_balance:
                 raise ValidationError(
                     _(
@@ -305,3 +249,22 @@ class CashRegisterEntry(models.Model):
         """Asegura que se ejecute la validación antes de guardar."""
         self.full_clean()
         super().save(*args, **kwargs)
+
+    @staticmethod
+    def get_current_balance():
+        """Calcula el saldo actual de la caja."""
+        deposits = (
+            CashRegisterEntry.objects.filter(entry_type="DEPOSIT").aggregate(
+                total=Sum("amount")
+            )["total"]
+            or 0
+        )
+
+        withdrawals = (
+            CashRegisterEntry.objects.filter(entry_type="WITHDRAWAL").aggregate(  # noqa
+                total=Sum("amount")
+            )["total"]
+            or 0
+        )
+
+        return deposits - withdrawals
