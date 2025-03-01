@@ -16,7 +16,6 @@ class Payment(models.Model):
         ("CREDIT_CARD", _("Tarjeta de crédito")),
         ("DEBIT_CARD", _("Tarjeta de débito")),
         ("BANK_TRANSFER", _("Transferencia bancaria")),
-        ("PAYPAL", _("PayPal")),
         ("QR", _("QR")),
         ("OTHER", _("Otro")),
     ]
