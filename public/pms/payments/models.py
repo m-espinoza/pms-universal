@@ -1,7 +1,10 @@
-from bookings.models import Booking
+from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.db.models import Sum
 from django.utils.translation import gettext_lazy as _
+
+from bookings.models import Booking
 
 
 class Payment(models.Model):
@@ -74,16 +77,6 @@ class Payment(models.Model):
         self.status = "COMPLETED"
         self.save()
 
-        # Actualizar el estado de la reserva si corresponde
-        if (
-            self.booking.total_price
-            <= self.booking.payments.filter(status="COMPLETED").aggregate(
-                models.Sum("amount")
-            )["amount__sum"]
-        ):
-            if self.booking.status == "PENDING_PAYMENT":
-                self.booking.confirm_booking()
-
     def refund(self, amount=None):
         """
         Reembolsa el pago completo o parcialmente.
@@ -107,3 +100,41 @@ class Payment(models.Model):
             self.status = "REFUNDED"
 
         self.save()
+
+    def clean(self):
+        """
+        Valida que el monto del pago no exceda
+        la deuda pendiente de la reserva.
+        Si el pago excede la deuda, lanza una ValidationError.
+        """
+
+        # Solo validamos si es un objeto nuevo (sin ID asignado)
+        # y si el estado no es 'REFUNDED' (para permitir reembolsos)
+        if not self.pk and self.status != "REFUNDED":
+            # Obtenemos el total de pagos completados
+            total_paid = (
+                self.booking.payments.filter(status="COMPLETED").aggregate(
+                    total=Sum("amount")
+                )["total"]
+                or 0.00
+            )
+
+            # Calculamos la deuda pendiente
+            pending_debt = self.booking.total_price - float(total_paid)
+
+            # Si el pago es mayor que la deuda pendiente
+            if self.amount > pending_debt:
+                excess_amount = float(self.amount) - pending_debt
+                raise ValidationError(
+                    f"El pago excede la deuda pendiente por {excess_amount}. "
+                    f"La deuda pendiente es de {pending_debt}."
+                )
+
+        super().clean()
+
+    def save(self, *args, **kwargs):
+        """
+        Sobrescribe el método save para asegurar que se ejecuta la validación.
+        """
+        self.full_clean()
+        super().save(*args, **kwargs)
