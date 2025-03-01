@@ -165,7 +165,9 @@ class Booking(models.Model):
 
         # Obtenemos la suma de todos los pagos completados
         payments_sum = (
-            self.payments.filter(status="COMPLETED").aggregate(total=Sum("amount"))[
+            self.payments.filter(status="COMPLETED").aggregate(
+                total=Sum("amount")
+            )[  # noqa
                 "total"
             ]
             or 0
