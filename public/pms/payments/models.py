@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
@@ -51,7 +52,7 @@ class Payment(models.Model):
         verbose_name=_("Estado"),
         max_length=20,
         choices=PAYMENT_STATUS_CHOICES,
-        default="PENDING",  # noqa
+        default="PENDING",
     )
     transaction_id = models.CharField(
         verbose_name=_("ID de transacción"),
@@ -77,7 +78,21 @@ class Payment(models.Model):
         self.status = "COMPLETED"
         self.save()
 
-    def refund(self, amount=None):
+        # Si el pago es en efectivo, registrarlo en la caja
+        if self.payment_method == "CASH" and self.status == "COMPLETED":
+            CashRegisterEntry.objects.create(
+                payment=self,
+                entry_type="DEPOSIT",
+                amount=self.amount,
+                created_by=(
+                    self.booking.created_by
+                    if hasattr(self.booking, "created_by")
+                    else None
+                ),
+                description=f"Pago en efectivo de reserva #{self.booking.id}",
+            )
+
+    def refund(self, amount=None, user=None):
         """
         Reembolsa el pago completo o parcialmente.
 
@@ -85,21 +100,33 @@ class Payment(models.Model):
             amount (Decimal, optional):
             Monto a reembolsar. Si no se especifica,
             se reembolsa el monto completo.
+            user (User): Usuario que realiza el reembolso
         """
         if amount and amount > self.amount:
             raise ValueError(
                 _(
                     "El monto a reembolsar no puede ser mayor que el monto del pago"  # noqa
-                )  # noqa
+                )
             )
+
+        refund_amount = amount if amount else self.amount
 
         if amount:
             self.status = "PARTIALLY_REFUNDED"
-            # Aquí podrías crear un nuevo registro de reembolso si es necesario
         else:
             self.status = "REFUNDED"
 
         self.save()
+
+        # Si el reembolso es de un pago en efectivo, registrar salida de caja
+        if self.payment_method == "CASH":
+            CashRegisterEntry.objects.create(
+                payment=self,
+                entry_type="WITHDRAWAL",
+                amount=refund_amount,
+                created_by=user,
+                description=f"Reembolso en efectivo de reserva #{self.booking.id}",  # noqa
+            )
 
     def clean(self):
         """
@@ -136,5 +163,145 @@ class Payment(models.Model):
         """
         Sobrescribe el método save para asegurar que se ejecuta la validación.
         """
+        self.full_clean()
+
+        # Guarda el pago
+        super().save(*args, **kwargs)
+
+        # Si es un pago nuevo en efectivo
+        # y está completado, registrarlo en caja
+        if (
+            kwargs.get("force_insert", False)
+            and self.payment_method == "CASH"
+            and self.status == "COMPLETED"
+        ):
+            CashRegisterEntry.objects.create(
+                payment=self,
+                entry_type="DEPOSIT",
+                amount=self.amount,
+                created_by=(
+                    self.booking.created_by
+                    if hasattr(self.booking, "created_by")
+                    else None
+                ),
+                description=f"Pago en efectivo de reserva #{self.booking.id}",
+            )
+
+
+class CashRegister(models.Model):
+    """Modelo para gestionar la caja del hostel."""
+
+    name = models.CharField(verbose_name=_("Nombre"), max_length=100)
+    description = models.TextField(
+        verbose_name=_("Descripción"), blank=True, null=True
+    )  # noqa
+    is_active = models.BooleanField(verbose_name=_("Activa"), default=True)
+    created_at = models.DateTimeField(
+        verbose_name=_("Fecha de creación"), auto_now_add=True
+    )
+    updated_at = models.DateTimeField(
+        verbose_name=_("Fecha de actualización"), auto_now=True
+    )
+
+    class Meta:
+        verbose_name = _("Caja")
+        verbose_name_plural = _("Cajas")
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def current_balance(self):
+        """Calcula el saldo actual de la caja."""
+        deposits = (
+            CashRegisterEntry.objects.filter(
+                cash_register=self, entry_type="DEPOSIT"
+            ).aggregate(total=Sum("amount"))["total"]
+            or 0
+        )
+
+        withdrawals = (
+            CashRegisterEntry.objects.filter(
+                cash_register=self, entry_type="WITHDRAWAL"
+            ).aggregate(total=Sum("amount"))["total"]
+            or 0
+        )
+
+        return deposits - withdrawals
+
+
+class CashRegisterEntry(models.Model):
+    """Modelo para registrar movimientos en la caja."""
+
+    ENTRY_TYPE_CHOICES = [
+        ("DEPOSIT", _("Ingreso")),
+        ("WITHDRAWAL", _("Retiro")),
+    ]
+
+    cash_register = models.ForeignKey(
+        CashRegister,
+        on_delete=models.CASCADE,
+        related_name="entries",
+        verbose_name=_("Caja"),
+        default=1,  # Se asume que habrá al menos una caja por defecto
+    )
+    payment = models.ForeignKey(
+        Payment,
+        on_delete=models.SET_NULL,
+        related_name="cash_entries",
+        verbose_name=_("Pago relacionado"),
+        null=True,
+        blank=True,
+    )
+    entry_type = models.CharField(
+        verbose_name=_("Tipo de movimiento"),
+        max_length=20,
+        choices=ENTRY_TYPE_CHOICES,  # noqa
+    )
+    amount = models.DecimalField(
+        verbose_name=_("Monto"),
+        max_digits=10,
+        decimal_places=2,
+        validators=[MinValueValidator(0.01)],
+    )
+    description = models.TextField(verbose_name=_("Descripción"))
+    created_at = models.DateTimeField(
+        verbose_name=_("Fecha de creación"), auto_now_add=True
+    )
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        related_name="cash_entries",
+        verbose_name=_("Creado por"),
+        null=True,
+    )
+
+    class Meta:
+        verbose_name = _("Movimiento de caja")
+        verbose_name_plural = _("Movimientos de caja")
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        entry_type_display = (
+            "Ingreso" if self.entry_type == "DEPOSIT" else "Retiro"
+        )  # noqa
+        return f"{entry_type_display} de ${self.amount} - {self.created_at.strftime('%d/%m/%Y %H:%M')}"  # noqa
+
+    def clean(self):
+        """Valida que haya suficiente saldo para retiros."""
+        if self.entry_type == "WITHDRAWAL" and not self.pk:
+            current_balance = self.cash_register.current_balance
+            if self.amount > current_balance:
+                raise ValidationError(
+                    _(
+                        f"No hay suficiente saldo en caja. Saldo actual: ${current_balance}"  # noqa
+                    )
+                )
+
+        super().clean()
+
+    def save(self, *args, **kwargs):
+        """Asegura que se ejecute la validación antes de guardar."""
         self.full_clean()
         super().save(*args, **kwargs)
