@@ -1,9 +1,9 @@
 import datetime
 from decimal import Decimal
 
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
-from django.core.exceptions import ValidationError
 
 from beds.models import Bed, Room
 from bookings.models import Booking
@@ -144,39 +144,89 @@ class PaymentModelTest(TestCase):
 
         # Ahora el estado debería ser FULLY_PAID
         self.assertEqual(self.booking.get_payment_status(), "FULLY_PAID")
-    
+
     def test_payment_exceeding_debt(self):
-        """Verificar que no se pueden crear pagos que excedan la deuda pendiente."""
+        """Verificar que no se pueden crear pagos
+        que excedan la deuda pendiente."""
         # Crear un pago parcial
         Payment.objects.create(
             booking=self.booking,
-            amount=Decimal('40.00'),
-            payment_method='CASH',
-            status='COMPLETED'
+            amount=Decimal("40.00"),
+            payment_method="CASH",
+            status="COMPLETED",
         )
-        
+
         # Verificar que el estado de pago es parcial
-        self.assertEqual(self.booking.get_payment_status(), 'PARTIAL_PAYMENT')
-        
+        self.assertEqual(self.booking.get_payment_status(), "PARTIAL_PAYMENT")
+
         # Intentar crear un pago que excede la deuda pendiente (20.00)
         with self.assertRaises(ValidationError) as context:
             Payment.objects.create(
                 booking=self.booking,
-                amount=Decimal('30.00'),  # Excede en 10.00
-                payment_method='CREDIT_CARD',
-                status='COMPLETED'
+                amount=Decimal("30.00"),  # Excede en 10.00
+                payment_method="CREDIT_CARD",
+                status="COMPLETED",
             )
-        
+
         # Verificar que el mensaje de error contiene la información del exceso
         self.assertIn("excede la deuda pendiente por", str(context.exception))
-        
+
         # Crear un pago por el monto exacto de la deuda pendiente
         Payment.objects.create(
             booking=self.booking,
-            amount=Decimal('20.00'),
-            payment_method='CREDIT_CARD',
-            status='COMPLETED'
+            amount=Decimal("20.00"),
+            payment_method="CREDIT_CARD",
+            status="COMPLETED",
         )
-        
+
         # Verificar que ahora el estado es totalmente pagado
-        self.assertEqual(self.booking.get_payment_status(), 'FULLY_PAID')
+        self.assertEqual(self.booking.get_payment_status(), "FULLY_PAID")
+
+    def test_negative_payment_amount(self):
+        """Verificar que no se pueden crear pagos con montos negativos."""
+        with self.assertRaises(ValidationError):
+            payment = Payment(
+                booking=self.booking,
+                amount=Decimal("-10.00"),
+                payment_method="CASH",
+                status="PENDING",
+            )
+            payment.full_clean()
+
+    def test_zero_payment_amount(self):
+        """Verificar que no se pueden crear pagos con monto cero."""
+        with self.assertRaises(ValidationError):
+            payment = Payment(
+                booking=self.booking,
+                amount=Decimal("0.00"),
+                payment_method="CREDIT_CARD",
+                status="PENDING",
+            )
+            payment.full_clean()
+
+    def test_very_small_payment_amount(self):
+        """Verificar que no se pueden crear
+        pagos con montos extremadamente pequeños."""
+        with self.assertRaises(ValidationError):
+            payment = Payment(
+                booking=self.booking,
+                amount=Decimal("0.001"),  # Menos de un céntimo
+                payment_method="BANK_TRANSFER",
+                status="PENDING",
+            )
+            payment.full_clean()
+
+    def test_saving_invalid_payment_fails(self):
+        """Verificar que el guardado de un pago inválido
+        falla a nivel de base de datos."""
+        # Intentamos crear directamente un pago con monto cero
+        # Nota: Esto intentará saltarse las validaciones del modelo,
+        # pero debería fallar a nivel de base de datos
+        # si los validadores de campo están configurados correctamente
+        with self.assertRaises(Exception):
+            Payment.objects.create(
+                booking=self.booking,
+                amount=Decimal("0.00"),
+                payment_method="PAYPAL",
+                status="PENDING",
+            )
