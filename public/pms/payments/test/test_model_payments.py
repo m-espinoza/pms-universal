@@ -132,7 +132,7 @@ class PaymentModelTest(TestCase):
         with self.assertRaises(ValidationError) as context:
             Payment.objects.create(
                 booking=self.booking,
-                amount=Decimal("30.00"),  # Excede en 10.00
+                amount=Decimal("30.00"),
                 payment_method="CREDIT_CARD",
                 status="COMPLETED",
                 created_by=self.user,
