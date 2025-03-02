@@ -9,7 +9,9 @@ from bookings.models import Booking
 
 
 class Payment(models.Model):
-    """Modelo para gestionar los pagos de reservas en el hostel."""
+    """
+    Modelo para gestionar los pagos y reembolsos de reservas en el hostel.
+    """
 
     PAYMENT_METHOD_CHOICES = [
         ("CASH", _("Efectivo")),
@@ -26,6 +28,12 @@ class Payment(models.Model):
         ("FAILED", _("Fallido")),
         ("REFUNDED", _("Reembolsado")),
         ("PARTIALLY_REFUNDED", _("Parcialmente reembolsado")),
+        ("REFUND", _("Reembolso")),
+    ]
+
+    PAYMENT_TYPE_CHOICES = [
+        ("PAYMENT", _("Pago")),
+        ("REFUND", _("Reembolso")),
     ]
 
     booking = models.ForeignKey(
@@ -38,8 +46,7 @@ class Payment(models.Model):
         verbose_name=_("Monto"),
         max_digits=10,
         decimal_places=2,
-        validators=[MinValueValidator(0.01)],
-    )
+    )  # Eliminamos el validador para permitir montos negativos
     payment_date = models.DateTimeField(_("Fecha de pago"), auto_now_add=True)
     payment_method = models.CharField(
         verbose_name=_("Método de pago"),
@@ -52,6 +59,21 @@ class Payment(models.Model):
         max_length=20,
         choices=PAYMENT_STATUS_CHOICES,
         default="PENDING",
+    )
+    payment_type = models.CharField(
+        verbose_name=_("Tipo de operación"),
+        max_length=20,
+        choices=PAYMENT_TYPE_CHOICES,
+        default="PAYMENT",
+    )
+    # Campo para relacionar un reembolso con su pago original
+    original_payment = models.ForeignKey(
+        "self",
+        on_delete=models.SET_NULL,
+        related_name="refunds",
+        verbose_name=_("Pago original"),
+        null=True,
+        blank=True,
     )
     transaction_id = models.CharField(
         verbose_name=_("ID de transacción"),
@@ -81,77 +103,82 @@ class Payment(models.Model):
         ordering = ["-payment_date"]
 
     def __str__(self):
-        return f"Pago {self.id} - Reserva {self.booking.id} - $ {self.amount}"
-
-    def mark_as_completed(self, user):
-        """Marca el pago como completado."""
-        self.status = "COMPLETED"
-        self.save()
-
-        # Si el pago es en efectivo, registrarlo en la caja
-        if self.payment_method == "CASH" and self.status == "COMPLETED":
-            CashRegisterEntry.objects.create(
-                payment=self,
-                entry_type="DEPOSIT",
-                amount=self.amount,
-                description=f"Pago en efectivo de reserva #{self.booking.id}",
-            )
+        operation_type = (
+            "Reembolso" if self.payment_type == "REFUND" else "Pago"
+        )  # noqa
+        return f"{operation_type} {self.id} - Reserva {self.booking.id} - $ {abs(self.amount)}"  # noqa
 
     def refund(self, amount=None, user=None):
         """
         Reembolsa el pago completo o parcialmente.
+        Crea un nuevo pago negativo como registro del reembolso.
 
         Args:
             amount (Decimal, optional):
-            Monto a reembolsar. Si no se especifica,
-            se reembolsa el monto completo.
+                Monto a reembolsar. Si no se especifica,
+                se reembolsa el monto completo.
             user (User): Usuario que realiza el reembolso
+
+        Returns:
+            Payment: El nuevo objeto de pago creado para el reembolso
         """
-        if amount and amount > self.amount:
-            raise ValueError(
-                _(
-                    "El monto a reembolsar no puede ser mayor que el monto del pago"  # noqa
-                )
-            )
-
-        refund_amount = amount if amount else self.amount
-
-        if amount:
-            self.status = "PARTIALLY_REFUNDED"
-        else:
+        if not amount:
+            refund_amount = self.amount
             self.status = "REFUNDED"
+        else:
+            if amount > self.amount:
+                raise ValueError(
+                    _(
+                        "El monto a reembolsar no puede ser mayor que el monto del pago"  # noqa
+                    )  # noqa
+                )
+            elif amount == self.amount:
+                refund_amount = amount
+                self.status = "REFUNDED"
+            else:
+                refund_amount = amount
+                self.status = "PARTIALLY_REFUNDED"
 
         self.save()
 
-        # Si el reembolso es de un pago en efectivo, registrar salida de caja
-        if self.payment_method == "CASH":
-            CashRegisterEntry.objects.create(
-                payment=self,
-                entry_type="WITHDRAWAL",
-                amount=refund_amount,
-                description=f"Reembolso en efectivo de reserva #{self.booking.id}",  # noqa
-            )
+        # Crear un nuevo pago negativo para el reembolso
+        refund_payment = Payment.objects.create(
+            booking=self.booking,
+            amount=-abs(refund_amount),  # Asegurar que el monto sea negativo
+            payment_method=self.payment_method,
+            status="COMPLETED",
+            payment_type="REFUND",
+            original_payment=self,
+            created_by=user,
+            notes=f"Reembolso del pago #{self.id}",
+        )
+
+        return refund_payment
 
     def clean(self):
         """
-        Valida que el monto del pago no exceda
-        la deuda pendiente de la reserva.
-        Si el pago excede la deuda, lanza una ValidationError.
+        Valida los montos de pagos y reembolsos.
         """
+        # Si es un pago normal (no un reembolso)
+        if (
+            self.payment_type == "PAYMENT"
+            and not self.pk
+            and self.status != "REFUNDED"  # noqa
+        ):  # noqa
+            # Validamos que el monto sea positivo
+            if self.amount <= 0:
+                raise ValidationError(
+                    _("El monto del pago debe ser mayor que cero")
+                )  # noqa
 
-        # Solo validamos si es un objeto nuevo (sin ID asignado)
-        # y si el estado no es 'REFUNDED' (para permitir reembolsos)
-        if not self.pk and self.status != "REFUNDED":
-            # Obtenemos el total de pagos completados
+            # Obtenemos el total de pagos completados (restando los reembolsos)
+            payments = self.booking.payments.filter(status="COMPLETED")
             total_paid = (
-                self.booking.payments.filter(status="COMPLETED").aggregate(
-                    total=Sum("amount")
-                )["total"]
-                or 0.00
+                sum([p.amount for p in payments]) if payments.exists() else 0.00  # noqa
             )
 
             # Calculamos la deuda pendiente
-            pending_debt = self.booking.total_price - float(total_paid)
+            pending_debt = float(self.booking.total_price) - float(total_paid)
 
             # Si el pago es mayor que la deuda pendiente
             if self.amount > pending_debt:
@@ -161,30 +188,56 @@ class Payment(models.Model):
                     f"La deuda pendiente es de {pending_debt}."
                 )
 
+        # Si es un reembolso
+        elif self.payment_type == "REFUND":
+            # Validamos que el monto sea negativo
+            if self.amount >= 0:
+                raise ValidationError(
+                    _("El monto del reembolso debe ser negativo")
+                )  # noqa
+
+            # Verificamos que exista el pago original si se especificó
+            if self.original_payment and not self.original_payment.pk:
+                raise ValidationError(
+                    _("El pago original especificado no existe")
+                )  # noqa
+
         super().clean()
 
     def save(self, *args, **kwargs):
-        """
-        Sobrescribe el método save para asegurar que se ejecuta la validación.
-        """
         self.full_clean()
-
-        # Guarda el pago
         super().save(*args, **kwargs)
 
-        # Si es un pago nuevo en efectivo
-        # y está completado, registrarlo en caja
-        if (
-            kwargs.get("force_insert", False)
-            and self.payment_method == "CASH"
-            and self.status == "COMPLETED"
-        ):
-            CashRegisterEntry.objects.create(
-                payment=self,
-                entry_type="DEPOSIT",
-                amount=self.amount,
-                description=f"Pago en efectivo de reserva #{self.booking.id}",
-            )
+        # Si el pago es en efectivo y está completado, registrarlo en caja
+        if self.status == "COMPLETED":
+            # Determinamos el tipo de entrada en la
+            # caja según el tipo de operación
+            if self.payment_type == "PAYMENT" and self.payment_method == "CASH":  # noqa
+                entry_type = "DEPOSIT"
+                description = f"Pago en efectivo de reserva #{self.booking.id}"  # noqa
+            elif (
+                self.payment_type == "REFUND" and self.payment_method == "CASH"
+            ):  # noqa
+                entry_type = "WITHDRAWAL"
+                description = (
+                    f"Reembolso en efectivo de reserva #{self.booking.id}"  # noqa
+                )
+                if self.original_payment:
+                    description += (
+                        f" (pago original #{self.original_payment.id})"  # noqa
+                    )
+            else:
+                # Si no es efectivo, no registramos en caja
+                return
+
+            # Verificar si ya existe una entrada en la caja para este pago
+            if not CashRegisterEntry.objects.filter(payment=self).exists():  # noqa
+                CashRegisterEntry.objects.create(
+                    payment=self,
+                    entry_type=entry_type,
+                    amount=abs(self.amount),
+                    description=description,
+                )
 
 
 class CashRegisterEntry(models.Model):
@@ -206,7 +259,7 @@ class CashRegisterEntry(models.Model):
     entry_type = models.CharField(
         verbose_name=_("Tipo de movimiento"),
         max_length=20,
-        choices=ENTRY_TYPE_CHOICES,  # noqa
+        choices=ENTRY_TYPE_CHOICES,
     )
     amount = models.DecimalField(
         verbose_name=_("Monto"),
