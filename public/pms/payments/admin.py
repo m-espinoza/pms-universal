@@ -17,23 +17,29 @@ class PaymentAdmin(admin.ModelAdmin):
         "status",
         "payment_date",
         "transaction_id",
-        "created_by",        
+        "created_by",
     )
     list_filter = ("payment_method", "status", "payment_date", "payment_type")
     search_fields = ("booking__guest__name", "transaction_id", "notes")
-    readonly_fields = ("payment_date", "created_by")  # Hacer created_by de solo lectura
+    readonly_fields = ("payment_date", "created_by")
     date_hierarchy = "payment_date"
     actions = ["mark_as_completed", "mark_as_refunded"]
 
     fieldsets = (
-        (None, {"fields": ("booking", "amount", "payment_method", "payment_type")}),
+        (
+            None,
+            {"fields": ("booking", "amount", "payment_method", "payment_type")},  # noqa
+        ),  # noqa
         (
             _("Estado y detalles"),
             {"fields": ("status", "transaction_id", "payment_date")},
         ),
         (
             _("Información adicional"),
-            {"fields": ("notes", "created_by"), "classes": ("collapse",)},  # Agregar created_by al fieldset
+            {
+                "fields": ("notes", "created_by"),
+                "classes": ("collapse",),
+            },  # Agregar created_by al fieldset
         ),  # noqa
     )
 
@@ -86,16 +92,21 @@ class PaymentAdmin(admin.ModelAdmin):
     )
 
     def get_queryset(self, request):
-        """Optimiza las consultas para reducir el número 
+        """Optimiza las consultas para reducir el número
         de consultas a la base de datos."""  # noqa
         return (
             super()
             .get_queryset(request)
-            .select_related("booking", "booking__guest", "created_by")  # Incluir created_by en select_related
+            .select_related(
+                "booking", "booking__guest", "created_by"
+            )  # Incluir created_by en select_related
         )
 
     def save_model(self, request, obj, form, change):
-        """Asigna automáticamente el usuario actual como created_by al crear un pago."""
+        """
+        Asigna automáticamente el usuario actual
+        como created_by al crear un pago.
+        """
         if not obj.pk:  # Si es un nuevo pago
             obj.created_by = request.user
         super().save_model(request, obj, form, change)
@@ -148,7 +159,9 @@ class CashRegisterEntryAdmin(admin.ModelAdmin):
         if updated_count == 1:
             message = _("1 movimiento ha sido marcado como ingreso.")
         else:
-            message = _("{} movimientos han sido marcados como ingresos.").format(
+            message = _(
+                "{} movimientos han sido marcados como ingresos."
+            ).format(  # noqa
                 updated_count
             )
 
@@ -165,7 +178,9 @@ class CashRegisterEntryAdmin(admin.ModelAdmin):
         if updated_count == 1:
             message = _("1 movimiento ha sido marcado como retiro.")
         else:
-            message = _("{} movimientos han sido marcados como retiros.").format(
+            message = _(
+                "{} movimientos han sido marcados como retiros."
+            ).format(  # noqa
                 updated_count
             )
 
@@ -176,10 +191,12 @@ class CashRegisterEntryAdmin(admin.ModelAdmin):
     )
 
     def get_queryset(self, request):
-        """Optimiza las consultas para reducir el número 
+        """Optimiza las consultas para reducir el número
         de consultas a la base de datos."""  # noqa
         return (
             super()
             .get_queryset(request)
-            .select_related("payment", "payment__booking", "payment__booking__guest")  # noqa
+            .select_related(
+                "payment", "payment__booking", "payment__booking__guest"
+            )  # noqa
         )
