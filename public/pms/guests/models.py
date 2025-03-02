@@ -7,38 +7,38 @@ from django.utils.translation import gettext_lazy as _
 
 class Guest(models.Model):
     DOCUMENT_TYPES = [
-        ("DNI", _("National ID")),
-        ("PASSPORT", _("Passport")),
+        ("DNI", _("Documento Nacional de Identidad")),
+        ("PASSPORT", _("Pasaporte")),
     ]
 
-    name = models.CharField(max_length=100, verbose_name=_("name"))
+    name = models.CharField(max_length=100, verbose_name=_("Nombre"))
 
     document_type = models.CharField(
-        max_length=8, choices=DOCUMENT_TYPES, verbose_name=_("document type")
+        max_length=8, choices=DOCUMENT_TYPES, verbose_name=_("Tipo de documento")
     )
 
     document_number = models.CharField(
-        max_length=20, verbose_name=_("document number")
+        max_length=20, verbose_name=_("Número de documento")
     )  # noqa
 
     birth_date = models.DateField(
-        null=True, blank=True, verbose_name=_("birth date")
+        null=True, blank=True, verbose_name=_("Fecha de nacimiento")
     )  # noqa
 
     phone_number = models.CharField(
-        max_length=20, verbose_name=_("phone number")
+        max_length=20, verbose_name=_("Número de teléfono")
     )  # noqa
 
-    nationality = models.CharField(max_length=50, verbose_name=_("nationality"))  # noqa
+    nationality = models.CharField(max_length=50, verbose_name=_("Nacionalidad"))  # noqa
 
     email = models.EmailField(
-        max_length=254, null=True, blank=True, verbose_name=_("email")
+        max_length=254, null=True, blank=True, verbose_name=_("Correo electrónico")
     )
 
     reservation_owner = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
-        verbose_name=_("reservation owner"),
+        verbose_name=_("Propietario de la reserva"),
         null=True,
         blank=True,
     )
@@ -48,8 +48,8 @@ class Guest(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = _("guest")
-        verbose_name_plural = _("guests")
+        verbose_name = _("Huésped")
+        verbose_name_plural = _("Huéspedes")
 
     def __str__(self):
         return self.name
