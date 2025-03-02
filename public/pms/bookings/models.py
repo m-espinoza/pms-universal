@@ -11,36 +11,36 @@ from guests.models import Guest
 
 class Booking(models.Model):
     STATUS_CHOICES = [
-        ("PENDING", _("Pending")),  # Reserva inicial, esperando confirmación
-        ("CONFIRMED", _("Confirmed")),  # Reserva confirmada
-        ("CHECKED_IN", _("Checked in")),  # Huésped ya está en el hostel
-        ("CHECKED_OUT", _("Checked out")),  # Huésped ya se fue
-        ("CANCELLED", _("Cancelled")),  # Reserva cancelada
+        ("PENDING", _("Pendiente")),  # Reserva inicial, esperando confirmación
+        ("CONFIRMED", _("Confirmada")),  # Reserva confirmada
+        ("CHECKED_IN", _("Registrado")),  # Huésped ya está en el hostel
+        ("CHECKED_OUT", _("Salida")),  # Huésped ya se fue
+        ("CANCELLED", _("Cancelada")),  # Reserva cancelada
     ]
 
     guest = models.ForeignKey(
         Guest,
         on_delete=models.CASCADE,
         related_name="bookings",
-        verbose_name=_("guest"),
+        verbose_name=_("Huésped"),
     )
 
     bed = models.ForeignKey(
         Bed,
         on_delete=models.CASCADE,
         related_name="bookings",
-        verbose_name=_("bed"),  # noqa
+        verbose_name=_("Cama"),  # noqa
     )
 
-    check_in_date = models.DateField(verbose_name=_("check-in date"))
+    check_in_date = models.DateField(verbose_name=_("Fecha de entrada"))
 
-    check_out_date = models.DateField(verbose_name=_("check-out date"))
+    check_out_date = models.DateField(verbose_name=_("Fecha de salida"))
 
     status = models.CharField(
         max_length=11,
         choices=STATUS_CHOICES,
         default="PENDING",
-        verbose_name=_("status"),
+        verbose_name=_("Estado"),
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -48,14 +48,14 @@ class Booking(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     total_price = models.DecimalField(
-        max_digits=10, decimal_places=2, verbose_name=_("total price")
+        max_digits=10, decimal_places=2, verbose_name=_("Precio total")
     )
 
-    notes = models.TextField(blank=True, verbose_name=_("notes"))
+    notes = models.TextField(blank=True, verbose_name=_("Notas"))
 
     class Meta:
-        verbose_name = _("booking")
-        verbose_name_plural = _("bookings")
+        verbose_name = _("Reserva")
+        verbose_name_plural = _("Reservas")
         # Índices para mejorar el rendimiento de las búsquedas
         indexes = [
             models.Index(fields=["bed", "check_in_date", "check_out_date"]),
@@ -75,7 +75,7 @@ class Booking(models.Model):
             raise ValidationError(
                 {
                     "check_in_date": _(
-                        "Check-in date must be before check-out date"
+                        "La fecha de entrada debe ser anterior a la fecha de salida"  # noqa
                     )  # noqa
                 }
             )
@@ -83,13 +83,13 @@ class Booking(models.Model):
         # Validar que check_in no sea en el pasado
         if self.check_in_date < date.today():
             raise ValidationError(
-                {"check_in_date": _("Cannot create bookings in the past")}
+                {"check_in_date": _("No se pueden crear reservas en el pasado")}  # noqa
             )
 
         # Validar disponibilidad de la cama
         if not self.is_bed_available():
             raise ValidationError(
-                _("This bed is not available for the selected dates")
+                _("Esta cama no está disponible para las fechas seleccionadas")
             )  # noqa
 
     def is_bed_available(self):
@@ -122,7 +122,9 @@ class Booking(models.Model):
     def confirm_booking(self):
         """Confirma una reserva pendiente"""
         if self.status != "PENDING":
-            raise ValidationError(_("Only pending bookings can be confirmed"))
+            raise ValidationError(
+                _("Solo se pueden confirmar reservas pendientes")  # noqa
+            )
         self.status = "CONFIRMED"
         self.save()
 
@@ -130,7 +132,7 @@ class Booking(models.Model):
         """Realiza el check-in de una reserva confirmada"""
         if self.status != "CONFIRMED":
             raise ValidationError(
-                _("Only confirmed bookings can be checked in")
+                _("Solo se pueden registrar reservas confirmadas")
             )  # noqa
         self.status = "CHECKED_IN"
         self.save()
@@ -139,7 +141,7 @@ class Booking(models.Model):
         """Realiza el check-out de una reserva con check-in"""
         if self.status != "CHECKED_IN":
             raise ValidationError(
-                _("Only checked-in bookings can be checked out")
+                _("Solo se pueden dar de baja reservas registradas")
             )  # noqa
         self.status = "CHECKED_OUT"
         self.save()
@@ -148,7 +150,7 @@ class Booking(models.Model):
         """Cancela una reserva pendiente o confirmada"""
         if self.status not in ["PENDING", "CONFIRMED"]:
             raise ValidationError(
-                _("Only pending or confirmed bookings can be cancelled")
+                _("Solo se pueden cancelar reservas pendientes o confirmadas")
             )
         self.status = "CANCELLED"
         self.save()
