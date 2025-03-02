@@ -76,7 +76,7 @@ class PaymentModelTest(TestCase):
         self.assertEqual(payment.status, "COMPLETED")
         self.assertEqual(payment.transaction_id, "TX123456")
         self.assertEqual(payment.created_by, self.user)
-        self.assertEqual(payment.payment_type, "PAYMENT")  # Por defecto es PAYMENT
+        self.assertEqual(payment.payment_type, "PAYMENT")
 
     def test_payment_status_fully_paid(self):
         """Verificar el estado de pago cuando está completamente pagado."""
@@ -116,7 +116,9 @@ class PaymentModelTest(TestCase):
         self.assertEqual(self.booking.get_payment_status(), "FULLY_PAID")
 
     def test_payment_exceeding_debt(self):
-        """Verificar que no se pueden crear pagos que excedan la deuda pendiente."""
+        """
+        Verificar que no se pueden crear pagos que excedan la deuda pendiente.
+        """
         # Crear un pago parcial
         Payment.objects.create(
             booking=self.booking,
@@ -164,7 +166,10 @@ class PaymentModelTest(TestCase):
             payment.full_clean()
 
     def test_cash_register_entry_creation(self):
-        """Verificar que se crea una entrada en la caja cuando se marca un pago en efectivo como completado."""
+        """
+        Verificar que se crea una entrada en la caja
+        cuando se marca un pago en efectivo como completado.
+        """
         payment = Payment.objects.create(
             booking=self.booking,
             amount=Decimal("30.00"),
@@ -179,12 +184,15 @@ class PaymentModelTest(TestCase):
         self.assertEqual(entry.entry_type, "DEPOSIT")
         self.assertEqual(entry.amount, Decimal("30.00"))
         self.assertEqual(
-            entry.description, f"Pago en efectivo de reserva #{self.booking.id}"
+            entry.description, f"Pago en efectivo de reserva #{self.booking.id}"  # noqa
         )
 
     # Nuevas pruebas para reembolsos
     def test_create_refund(self):
-        """Verificar que se puede crear un reembolso correctamente usando el método refund()."""
+        """
+        Verificar que se puede crear un reembolso
+        correctamente usando el método refund().
+        """
         # Crear un pago
         payment = Payment.objects.create(
             booking=self.booking,
@@ -239,10 +247,15 @@ class PaymentModelTest(TestCase):
         with self.assertRaises(ValueError) as context:
             payment.refund(amount=Decimal("40.00"), user=self.user)
 
-        self.assertIn("no puede ser mayor que el monto del pago", str(context.exception))
+        self.assertIn(
+            "no puede ser mayor que el monto del pago", str(context.exception)
+        )
 
     def test_refund_cash_creates_withdrawal_in_cash_register(self):
-        """Verificar que un reembolso en efectivo crea una entrada de retiro en la caja."""
+        """
+        Verificar que un reembolso en efectivo
+        crea una entrada de retiro en la caja.
+        """
         # Crear un pago en efectivo
         payment = Payment.objects.create(
             booking=self.booking,
@@ -260,10 +273,16 @@ class PaymentModelTest(TestCase):
         self.assertIsNotNone(entry)
         self.assertEqual(entry.entry_type, "WITHDRAWAL")
         self.assertEqual(entry.amount, Decimal("10.00"))  # Valor absoluto
-        self.assertIn(f"Reembolso en efectivo de reserva #{self.booking.id}", entry.description)
+        self.assertIn(
+            f"Reembolso en efectivo de reserva #{self.booking.id}",
+            entry.description,  # noqa
+        )
 
     def test_refund_non_cash_payment_no_cash_register_entry(self):
-        """Verificar que un reembolso de un pago que no es en efectivo no crea entrada en caja."""
+        """
+        Verificar que un reembolso de un pago
+        que no es en efectivo no crea entrada en caja.
+        """
         # Crear un pago con tarjeta
         payment = Payment.objects.create(
             booking=self.booking,
@@ -281,7 +300,10 @@ class PaymentModelTest(TestCase):
         self.assertIsNone(entry)
 
     def test_payment_balance_after_refunds(self):
-        """Verificar que el balance de pagos se calcula correctamente después de reembolsos."""
+        """
+        Verificar que el balance de pagos
+        se calcula correctamente después de reembolsos.
+        """
         # Crear un pago completo
         Payment.objects.create(
             booking=self.booking,
@@ -338,7 +360,7 @@ class PaymentModelTest(TestCase):
 
         # Completar el reembolso
         refund.mark_as_completed(self.user)
-        
+
         # Ahora sí debería afectar al balance
         self.assertEqual(self.booking.get_payment_status(), "PARTIAL_PAYMENT")
 
@@ -389,7 +411,10 @@ class CashRegisterEntryTest(TestCase):
         )
 
     def test_cash_register_balance_after_multiple_operations(self):
-        """Verificar el saldo de la caja después de múltiples operaciones incluyendo reembolsos."""
+        """
+        Verificar el saldo de la caja después
+        de múltiples operaciones incluyendo reembolsos.
+        """
         # Primer pago en efectivo
         payment1 = Payment.objects.create(
             booking=self.booking,
@@ -416,7 +441,10 @@ class CashRegisterEntryTest(TestCase):
         self.assertEqual(balance, Decimal("35.00"))  # 30 + 20 - 15 = 35
 
     def test_cash_register_balance_with_non_cash_payments(self):
-        """Verificar que los pagos y reembolsos que no son en efectivo no afectan la caja."""
+        """
+        Verificar que los pagos y reembolsos
+        que no son en efectivo no afectan la caja.
+        """
         # Pago en efectivo
         Payment.objects.create(
             booking=self.booking,
@@ -438,6 +466,7 @@ class CashRegisterEntryTest(TestCase):
         # Reembolso del pago con tarjeta
         payment2.refund(amount=Decimal("10.00"), user=self.user)
 
-        # Verificar el saldo de la caja (solo debería contar el pago en efectivo)
+        # Verificar el saldo de la caja
+        # (solo debería contar el pago en efectivo)
         balance = CashRegisterEntry.get_current_balance()
         self.assertEqual(balance, Decimal("30.00"))
