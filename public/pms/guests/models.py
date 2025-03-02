@@ -14,7 +14,9 @@ class Guest(models.Model):
     name = models.CharField(max_length=100, verbose_name=_("Nombre"))
 
     document_type = models.CharField(
-        max_length=8, choices=DOCUMENT_TYPES, verbose_name=_("Tipo de documento")
+        max_length=8,
+        choices=DOCUMENT_TYPES,
+        verbose_name=_("Tipo de documento"),  # noqa
     )
 
     document_number = models.CharField(
@@ -29,10 +31,15 @@ class Guest(models.Model):
         max_length=20, verbose_name=_("Número de teléfono")
     )  # noqa
 
-    nationality = models.CharField(max_length=50, verbose_name=_("Nacionalidad"))  # noqa
+    nationality = models.CharField(
+        max_length=50, verbose_name=_("Nacionalidad")
+    )  # noqa
 
     email = models.EmailField(
-        max_length=254, null=True, blank=True, verbose_name=_("Correo electrónico")
+        max_length=254,
+        null=True,
+        blank=True,
+        verbose_name=_("Correo electrónico"),  # noqa
     )
 
     reservation_owner = models.OneToOneField(
