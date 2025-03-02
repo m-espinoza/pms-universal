@@ -15,7 +15,7 @@ class RoomModelTest(TestCase):
 
     def test_create_room(self):
         self.assertEqual(self.room.name, "Room 101")
-        self.assertEqual(self.room.get_room_type_display(), "Private Room")
+        self.assertEqual(self.room.get_room_type_display(), "Habitación privada")
 
     def test_room_name_unique(self):
         with self.assertRaises(ValidationError):
@@ -38,4 +38,4 @@ class RoomModelTest(TestCase):
 
     def test_room_str_method(self):
         # Verificar el método __str__
-        self.assertEqual(str(self.room), "Room Room 101 (Private Room)")
+        self.assertEqual(str(self.room), "Habitación Room 101 (Habitación privada)")
