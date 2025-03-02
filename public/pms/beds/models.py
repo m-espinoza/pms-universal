@@ -16,19 +16,19 @@ class Room(models.Model):
     )
 
     room_type = models.CharField(
-        max_length=7,
-        choices=ROOM_TYPES,
-        verbose_name=_("Tipo de habitación")
+        max_length=7, choices=ROOM_TYPES, verbose_name=_("Tipo de habitación")
     )
 
     capacity = models.IntegerField(
         verbose_name=_("Capacidad"), blank=True, default=1
-    )
+    )  # noqa
 
     description = models.TextField(
         blank=True,
         verbose_name=_("Descripción"),
-        help_text=_("Descripción de la habitación (baño privado, comodidades, etc.)"),
+        help_text=_(
+            "Descripción de la habitación (baño privado, comodidades, etc.)"  # noqa
+        ),
     )
 
     is_active = models.BooleanField(default=True, verbose_name=_("Activo"))
@@ -43,7 +43,7 @@ class Room(models.Model):
         ordering = ["name"]
 
     def __str__(self):
-        return f"{_('Habitación')} {self.name} ({self.get_room_type_display()})"
+        return f"{_('Habitación')} {self.name} ({self.get_room_type_display()})"  # noqa
 
 
 class Bed(models.Model):
