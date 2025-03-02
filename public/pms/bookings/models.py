@@ -75,7 +75,7 @@ class Booking(models.Model):
             raise ValidationError(
                 {
                     "check_in_date": _(
-                        "La fecha de entrada debe ser anterior a la fecha de salida"
+                        "La fecha de entrada debe ser anterior a la fecha de salida"  # noqa
                     )  # noqa
                 }
             )
@@ -83,7 +83,7 @@ class Booking(models.Model):
         # Validar que check_in no sea en el pasado
         if self.check_in_date < date.today():
             raise ValidationError(
-                {"check_in_date": _("No se pueden crear reservas en el pasado")}
+                {"check_in_date": _("No se pueden crear reservas en el pasado")}  # noqa
             )
 
         # Validar disponibilidad de la cama
@@ -122,7 +122,9 @@ class Booking(models.Model):
     def confirm_booking(self):
         """Confirma una reserva pendiente"""
         if self.status != "PENDING":
-            raise ValidationError(_("Solo se pueden confirmar reservas pendientes"))
+            raise ValidationError(
+                _("Solo se pueden confirmar reservas pendientes")  # noqa
+            )
         self.status = "CONFIRMED"
         self.save()
 
