@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="login-container">
+    <h2>Iniciar Sesión - PMS Hostels</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Iniciar Sesión</button>
+    </form>
+</div>
+{% endblock %}

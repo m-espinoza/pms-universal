@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-container">
+    <h2>Dashboard</h2>
+    <p>Bienvenido, {{ request.user.username }}!</p>
+    <div class="dashboard-actions">
+        <a href="{% url 'logout' %}">Cerrar Sesión</a>
+    </div>
+    <!-- Aquí puedes agregar enlaces a las diferentes secciones de tu PMS -->
+</div>
+{% endblock %}

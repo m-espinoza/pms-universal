@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PMS Hostels</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>PMS Hostels</h1>
+        </div>
+        {% if user.is_authenticated %}
+        <nav>
+            <a href="{% url 'dashboard' %}">Dashboard</a>
+            <!-- Otros enlaces de navegación -->
+        </nav>
+        {% endif %}
+    </header>
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+    <footer>
+        <p>&copy; 2025 PMS Hostels</p>
+    </footer>
+    <script src="{% static 'js/scripts.js' %}"></script>
+</body>
+</html>
