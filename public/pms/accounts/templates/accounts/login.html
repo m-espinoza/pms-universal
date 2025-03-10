@@ -3,6 +3,7 @@
 {% block h1 %}Login{% endblock h1 %} 
 {% block content %}
 <div class="login-container">
+    <h2>Iniciar Sesión</h2>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
