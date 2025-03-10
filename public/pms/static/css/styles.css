@@ -1,0 +1,64 @@
+/* Estilos básicos */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f8f9fa; /* Color de fondo ligero de Bootstrap */
+}
+
+/* Estilos para el header */
+header {
+    background-color: #343a40; /* Color de fondo oscuro de Bootstrap */
+    color: white;
+}
+
+/* Estilos para el main */
+main {
+    padding: 2rem 0; /* Espaciado vertical */
+}
+
+/* Estilos para el footer */
+footer {
+    background-color: #343a40; /* Color de fondo oscuro de Bootstrap */
+    color: white;
+    text-align: center;
+    padding: 1rem 0;
+}
+
+/* Estilos para el login */
+.login-container {
+    max-width: 500px;
+    margin: 2rem auto; /* Centrado con margen */
+    background: white;
+    padding: 2rem;
+    border-radius: 0.25rem; /* Bordes redondeados */
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1); /* Sombra suave */
+}
+
+/* Estilos para el dashboard */
+.dashboard-container {
+    background: white;
+    padding: 2rem;
+    border-radius: 0.25rem; /* Bordes redondeados */
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1); /* Sombra suave */
+}
+
+/* Estilos personalizados adicionales */
+.custom-card {
+    background: white;
+    border-radius: 0.25rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.custom-btn {
+    background-color: #007bff; /* Color primario de Bootstrap */
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    transition: background-color 0.3s ease;
+}
+
+.custom-btn:hover {
+    background-color: #0056b3; /* Color primario oscuro de Bootstrap */
+}

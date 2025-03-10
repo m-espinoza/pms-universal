@@ -7,3 +7,4 @@ django-filter==22.1
 gunicorn==23.0.0
 django-rest-knox==5.0.2
 pytz==2025.1
+django-axes==7.0.2

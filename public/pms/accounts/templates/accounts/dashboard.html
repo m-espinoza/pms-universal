@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock title %}
+{% block encabezado %}Dashboard{% endblock encabezado %}
+{% block content %}
+<div class="dashboard-container">
+    <p>Bienvenido, {{ request.user.username }}!</p>
+    <div class="dashboard-actions">
+        <form method="post" action="{% url 'logout' %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit">Cerrar Sesión</button>
+        </form>
+    </div>
+    <!-- Aquí puedes agregar enlaces a las diferentes secciones de tu PMS -->
+</div>
+{% endblock %}
