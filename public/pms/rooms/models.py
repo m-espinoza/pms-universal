@@ -4,31 +4,17 @@ from django.utils.translation import gettext_lazy as _
 
 class Room(models.Model):
     ROOM_TYPES = [
-        ("DORM", _("Dormitorio compartido")),
-        ("PRIVATE", _("Habitación privada")),
-        ("CABIN", _("Cabaña")),
-        ("APARTMENT", _("Apartamento")),
-        ("STUDIO", _("Estudio")),
-        ("SUITE", _("Suite")),
-        ("DELUXE", _("Habitación deluxe")),
-        ("BUNGALOW", _("Bungalow")),
-        ("VILLA", _("Villa")),
-        ("COTTAGE", _("Casa rural")),
-        ("CAMPING", _("Zona de camping")),
-        ("GLAMPING", _("Glamping")),
-        ("LOFT", _("Loft")),
-        ("MOBILE_HOME", _("Casa móvil")),
-        ("TENT", _("Tienda de campaña preparada")),
-        ("IGLOO", _("Iglú")),
-        ("TREEHOUSE", _("Casa en el árbol")),
-        ("YURT", _("Yurta")),
-        ("TINY_HOUSE", _("Casa pequeña")),
-        ("RV_SPOT", _("Espacio para autocaravana")),
-        ("DORM_FEMALE", _("Dormitorio femenino")),
-        ("DORM_MALE", _("Dormitorio masculino")),
-        ("DORM_MIXED", _("Dormitorio mixto")),
-        ("FAMILY_ROOM", _("Habitación familiar")),
-    ]
+    ("CABIN", _("Cabaña")),  # Todas las unidades en esta categoría son cabañas
+    ("DORM", _("Dormitorio compartido")),  # Todas las unidades son camas en un dormitorio compartido
+    ("GLAMPING", _("Glamping")),  # Todas las unidades son espacios de glamping
+    ("CAMPING", _("Zona de camping")),  # Todas las unidades son espacios para acampar
+    ("PRIVATE_ROOM", _("Habitación privada")),  # Todas las unidades son habitaciones privadas
+    ("SPECIAL_ROOM", _("Dormitorio especial")),  # Todas las unidades son dormitorios especiales
+    ("APARTMENT", _("Apartamento")),  # Todas las unidades son apartamentos
+    ("VILLA", _("Villa")),  # Todas las unidades son villas
+    ("TENT", _("Tienda de campaña preparada")),  # Todas las unidades son tiendas preparadas
+    ("OTHER", _("Otro tipo de alojamiento")),  # Para categorías no especificadas
+]
 
     name = models.CharField(
         max_length=128,
@@ -77,37 +63,39 @@ class Room(models.Model):
 
 class Unit(models.Model):
     UNIT_TYPES = [
-        # Camas en dormitorios
+        # Unidades para cabañas
+        ("BASIC_CABIN", _("Cabaña básica")),
+        ("DELUXE_CABIN", _("Cabaña deluxe")),
+        # Unidades para dormitorios compartidos
         ("SINGLE_BED", _("Cama individual")),
-        ("BUNK_TOP", _("Litera superior")),
-        ("BUNK_BOTTOM", _("Litera inferior")),
-        ("DOUBLE_BED", _("Cama doble")),
+        ("BUNK_BED", _("Litera")),
         ("QUEEN_BED", _("Cama queen")),
         ("KING_BED", _("Cama king")),
-        # Cabañas
-        ("BASIC_CABIN", _("Cabaña básica")),
-        ("STANDARD_CABIN", _("Cabaña estándar")),
-        ("DELUXE_CABIN", _("Cabaña deluxe")),
-        # Apartamentos
-        ("STUDIO_UNIT", _("Unidad estudio")),
-        ("ONE_BEDROOM", _("Una habitación")),
-        ("TWO_BEDROOM", _("Dos habitaciones")),
-        ("PENTHOUSE", _("Ático")),
-        # Camping
+        # Unidades para glamping
+        ("GLAMPING_TENT", _("Tienda de glamping")),
+        ("GLAMPING_POD", _("Cápsula de glamping")),
+        # Unidades para camping
         ("TENT_SPACE", _("Espacio para tienda")),
         ("CAMPER_SPACE", _("Espacio para caravana")),
         ("HAMMOCK", _("Hamaca")),
-        # Alojamientos especiales
-        ("POD", _("Cápsula para dormir")),
-        ("HAMMOCK", _("Hamaca")),
-        ("TENT_PLATFORM", _("Plataforma para tienda")),
+        # Unidades para habitaciones privadas
+        ("PRIVATE_ROOM", _("Habitación privada")),
+        ("PRIVATE_SUITE", _("Suite privada")),
+        # Unidades para dormitorios especiales
+        ("SPECIAL_BED", _("Cama especial")),
+        ("SPECIAL_ROOM", _("Habitación especial")),
+        # Unidades para apartamentos y villas
+        ("STUDIO", _("Estudio")),
+        ("ONE_BEDROOM", _("Una habitación")),
+        ("TWO_BEDROOM", _("Dos habitaciones")),
+        ("ENTIRE_APARTMENT", _("Apartamento completo")),
+        ("ENTIRE_VILLA", _("Villa completa")),
+        # Otras unidades
         ("AIRSTREAM", _("Airstream")),
         ("TEEPEE", _("Tipi")),
-        # Adicionales
-        ("ENTIRE_ROOM", _("Habitación completa")),
-        ("ENTIRE_CABIN", _("Cabaña completa")),
-        ("ENTIRE_VILLA", _("Villa completa")),
-        ("ENTIRE_HOUSE", _("Casa completa")),
+        ("YURT", _("Yurta")),
+        ("TREEHOUSE", _("Casa en el árbol")),
+        ("OTHER", _("Otra unidad")),  # Para unidades no especificadas
     ]
 
     name = models.CharField(
