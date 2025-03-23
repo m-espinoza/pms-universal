@@ -10,9 +10,9 @@ from guests.models import Guest
 class BookingModelTest(TestCase):
     def setUp(self):
         # Configuración común para las pruebas
-        self.room = Room.objects.create(name="Room 101", room_type="PRIVATE")
+        self.room = Room.objects.create(name="Room 101", room_type="PRIVATE", base_price=100)
         self.unit = Unit.objects.create(
-            number=1, unit_type="SINGLE", room=self.room
+            name="1", unit_type="SINGLE", room=self.room
         )  # noqa
         self.guest = Guest.objects.create(
             name="John Doe", document_type="DNI", document_number="12345678"
@@ -22,6 +22,7 @@ class BookingModelTest(TestCase):
             unit=self.unit,
             check_in_date=date.today(),
             check_out_date=date.today() + timedelta(days=3),
+            total_price=self.room.base_price * 3,
             status="PENDING",
         )
 

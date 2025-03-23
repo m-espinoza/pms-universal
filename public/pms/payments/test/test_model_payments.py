@@ -21,15 +21,15 @@ class PaymentModelTest(TestCase):
             name="Habitación 101",
             room_type="DORM",
             capacity=4,
+            base_price=20.00,
             description="Habitación compartida con 4 camas",
             is_active=True,
         )
 
         self.unit = Unit.objects.create(
-            number=1,
+            name="1",
             unit_type="SINGLE",
-            room=self.room,
-            base_price=20.00,
+            room=self.room,            
             is_active=True,
         )
 
@@ -374,15 +374,15 @@ class CashRegisterEntryTest(TestCase):
             name="Habitación 101",
             room_type="DORM",
             capacity=4,
+            base_price=20.00,
             description="Habitación compartida con 4 camas",
             is_active=True,
         )
 
         self.unit = Unit.objects.create(
-            number=1,
+            name="1",
             unit_type="SINGLE",
-            room=self.room,
-            base_price=20.00,
+            room=self.room,            
             is_active=True,
         )
 
