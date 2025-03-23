@@ -9,7 +9,7 @@ class RoomModelTest(TestCase):
         # Configuración común para las pruebas
         self.room = Room.objects.create(
             name="Room 101",
-            room_type="PRIVATE",
+            room_type="PRIVATE_ROOM",
             capacity=2,
             description="A nice private room.",
         )
@@ -22,7 +22,7 @@ class RoomModelTest(TestCase):
 
     def test_room_name_unique(self):
         with self.assertRaises(ValidationError):
-            room = Room(name="Room 101", room_type="PRIVATE")
+            room = Room(name="Room 101", room_type="PRIVATE_ROOM")
             room.full_clean()
 
     def test_modify_room(self):
