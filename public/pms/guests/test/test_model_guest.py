@@ -1,6 +1,7 @@
 from datetime import date
 
 from django.test import TestCase
+
 from guests.models import Guest
 
 

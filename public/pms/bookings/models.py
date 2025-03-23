@@ -5,8 +5,8 @@ from django.db import models
 from django.db.models import Q, Sum
 from django.utils.translation import gettext_lazy as _
 
-from rooms.models import Unit
 from guests.models import Guest
+from rooms.models import Unit
 
 
 class Booking(models.Model):

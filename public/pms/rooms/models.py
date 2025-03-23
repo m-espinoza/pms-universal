@@ -38,15 +38,11 @@ class Room(models.Model):
     )
 
     room_type = models.CharField(
-        max_length=32,
-        choices=ROOM_TYPES,
-        verbose_name=_("Tipo de habitación")
+        max_length=32, choices=ROOM_TYPES, verbose_name=_("Tipo de habitación")
     )
 
     capacity = models.IntegerField(
-        verbose_name=_("Capacidad"),
-        blank=True,
-        default=1
+        verbose_name=_("Capacidad"), blank=True, default=1
     )  # noqa
 
     base_price = models.DecimalField(
@@ -88,30 +84,25 @@ class Unit(models.Model):
         ("DOUBLE_BED", _("Cama doble")),
         ("QUEEN_BED", _("Cama queen")),
         ("KING_BED", _("Cama king")),
-        
         # Cabañas
         ("BASIC_CABIN", _("Cabaña básica")),
         ("STANDARD_CABIN", _("Cabaña estándar")),
         ("DELUXE_CABIN", _("Cabaña deluxe")),
-        
         # Apartamentos
         ("STUDIO_UNIT", _("Unidad estudio")),
         ("ONE_BEDROOM", _("Una habitación")),
         ("TWO_BEDROOM", _("Dos habitaciones")),
         ("PENTHOUSE", _("Ático")),
-        
         # Camping
         ("TENT_SPACE", _("Espacio para tienda")),
         ("CAMPER_SPACE", _("Espacio para caravana")),
         ("HAMMOCK", _("Hamaca")),
-        
         # Alojamientos especiales
         ("POD", _("Cápsula para dormir")),
         ("HAMMOCK", _("Hamaca")),
         ("TENT_PLATFORM", _("Plataforma para tienda")),
         ("AIRSTREAM", _("Airstream")),
         ("TEEPEE", _("Tipi")),
-        
         # Adicionales
         ("ENTIRE_ROOM", _("Habitación completa")),
         ("ENTIRE_CABIN", _("Cabaña completa")),
@@ -150,6 +141,6 @@ class Unit(models.Model):
         verbose_name = _("Unidad")
         verbose_name_plural = _("Unidades")
         unique_together = ["room", "name"]
-    
+
     def __str__(self):
         return f"{_('Unidad')} {self.name} ({self.get_unit_type_display()})"  # noqa

@@ -1,16 +1,19 @@
 from datetime import date, timedelta
 
-from rooms.models import Unit, Room
-from bookings.models import Booking
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+
+from bookings.models import Booking
 from guests.models import Guest
+from rooms.models import Room, Unit
 
 
 class BookingModelTest(TestCase):
     def setUp(self):
         # Configuración común para las pruebas
-        self.room = Room.objects.create(name="Room 101", room_type="PRIVATE", base_price=100)
+        self.room = Room.objects.create(
+            name="Room 101", room_type="PRIVATE", base_price=100
+        )
         self.unit = Unit.objects.create(
             name="1", unit_type="SINGLE", room=self.room
         )  # noqa

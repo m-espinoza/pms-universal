@@ -1,6 +1,7 @@
-from rooms.models import Room
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+
+from rooms.models import Room
 
 
 class RoomModelTest(TestCase):

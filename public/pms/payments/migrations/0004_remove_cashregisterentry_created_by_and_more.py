@@ -9,39 +9,46 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('payments', '0003_remove_cashregisterentry_cash_register_and_more'),
+        ("payments", "0003_remove_cashregisterentry_cash_register_and_more"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='cashregisterentry',
-            name='created_by',
+            model_name="cashregisterentry",
+            name="created_by",
         ),
         migrations.AddField(
-            model_name='cashregisterentry',
-            name='updated_at',
+            model_name="cashregisterentry",
+            name="updated_at",
             field=models.DateTimeField(auto_now=True),
         ),
         migrations.AddField(
-            model_name='payment',
-            name='created_at',
-            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
+            model_name="payment",
+            name="created_at",
+            field=models.DateTimeField(
+                auto_now_add=True, default=django.utils.timezone.now
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='payment',
-            name='created_by',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL, verbose_name='Creado por'),
+            model_name="payment",
+            name="created_by",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="Creado por",
+            ),
         ),
         migrations.AddField(
-            model_name='payment',
-            name='updated_at',
+            model_name="payment",
+            name="updated_at",
             field=models.DateTimeField(auto_now=True),
         ),
         migrations.AlterField(
-            model_name='cashregisterentry',
-            name='created_at',
+            model_name="cashregisterentry",
+            name="created_at",
             field=models.DateTimeField(auto_now_add=True),
         ),
     ]

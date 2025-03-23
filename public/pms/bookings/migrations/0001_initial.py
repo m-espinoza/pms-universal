@@ -9,29 +9,80 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('guests', '0001_initial'),
-        ('rooms', '0001_initial'),
+        ("guests", "0001_initial"),
+        ("rooms", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Booking',
+            name="Booking",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('check_in_date', models.DateField(verbose_name='Fecha de entrada')),
-                ('check_out_date', models.DateField(verbose_name='Fecha de salida')),
-                ('status', models.CharField(choices=[('PENDING', 'Pendiente'), ('CONFIRMED', 'Confirmada'), ('CHECKED_IN', 'Registrado'), ('CHECKED_OUT', 'Salida'), ('CANCELLED', 'Cancelada')], default='PENDING', max_length=11, verbose_name='Estado')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('total_price', models.DecimalField(decimal_places=2, max_digits=10, verbose_name='Precio total')),
-                ('notes', models.TextField(blank=True, verbose_name='Notas')),
-                ('guest', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='bookings', to='guests.guest', verbose_name='Huésped')),
-                ('unit', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='bookings', to='rooms.unit', verbose_name='Unidad')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("check_in_date", models.DateField(verbose_name="Fecha de entrada")),
+                ("check_out_date", models.DateField(verbose_name="Fecha de salida")),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("PENDING", "Pendiente"),
+                            ("CONFIRMED", "Confirmada"),
+                            ("CHECKED_IN", "Registrado"),
+                            ("CHECKED_OUT", "Salida"),
+                            ("CANCELLED", "Cancelada"),
+                        ],
+                        default="PENDING",
+                        max_length=11,
+                        verbose_name="Estado",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "total_price",
+                    models.DecimalField(
+                        decimal_places=2, max_digits=10, verbose_name="Precio total"
+                    ),
+                ),
+                ("notes", models.TextField(blank=True, verbose_name="Notas")),
+                (
+                    "guest",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="bookings",
+                        to="guests.guest",
+                        verbose_name="Huésped",
+                    ),
+                ),
+                (
+                    "unit",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="bookings",
+                        to="rooms.unit",
+                        verbose_name="Unidad",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Reserva',
-                'verbose_name_plural': 'Reservas',
-                'indexes': [models.Index(fields=['unit', 'check_in_date', 'check_out_date'], name='bookings_bo_unit_id_42da8c_idx'), models.Index(fields=['status'], name='bookings_bo_status_233e96_idx')],
+                "verbose_name": "Reserva",
+                "verbose_name_plural": "Reservas",
+                "indexes": [
+                    models.Index(
+                        fields=["unit", "check_in_date", "check_out_date"],
+                        name="bookings_bo_unit_id_42da8c_idx",
+                    ),
+                    models.Index(
+                        fields=["status"], name="bookings_bo_status_233e96_idx"
+                    ),
+                ],
             },
         ),
     ]

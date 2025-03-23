@@ -1,7 +1,8 @@
-from accounts import urls
 from django.contrib import admin
 from django.urls import include, path
-from django.views.generic import RedirectView
+from django.views.generic import RedirectView  # noqa
+
+from accounts import urls  # noqa
 
 urlpatterns = [
     path("admin/", admin.site.urls),

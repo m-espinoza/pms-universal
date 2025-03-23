@@ -8,44 +8,169 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Room',
+            name="Room",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(help_text='El nombre de la habitación debe ser único.', max_length=128, unique=True, verbose_name='Nombre')),
-                ('room_type', models.CharField(choices=[('DORM', 'Dormitorio compartido'), ('PRIVATE', 'Habitación privada'), ('CABIN', 'Cabaña'), ('APARTMENT', 'Apartamento'), ('STUDIO', 'Estudio'), ('SUITE', 'Suite'), ('DELUXE', 'Habitación deluxe'), ('BUNGALOW', 'Bungalow'), ('VILLA', 'Villa'), ('COTTAGE', 'Casa rural'), ('CAMPING', 'Zona de camping'), ('GLAMPING', 'Glamping'), ('LOFT', 'Loft'), ('MOBILE_HOME', 'Casa móvil'), ('TENT', 'Tienda de campaña preparada'), ('IGLOO', 'Iglú'), ('TREEHOUSE', 'Casa en el árbol'), ('YURT', 'Yurta'), ('TINY_HOUSE', 'Casa pequeña'), ('RV_SPOT', 'Espacio para autocaravana'), ('DORM_FEMALE', 'Dormitorio femenino'), ('DORM_MALE', 'Dormitorio masculino'), ('DORM_MIXED', 'Dormitorio mixto'), ('FAMILY_ROOM', 'Habitación familiar')], max_length=32, verbose_name='Tipo de habitación')),
-                ('capacity', models.IntegerField(blank=True, default=1, verbose_name='Capacidad')),
-                ('base_price', models.DecimalField(decimal_places=2, default=0.0, max_digits=10, verbose_name='Precio base')),
-                ('description', models.TextField(blank=True, help_text='Descripción de la habitación (baño privado, comodidades, etc.)', verbose_name='Descripción')),
-                ('is_active', models.BooleanField(default=True, verbose_name='Activo')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        help_text="El nombre de la habitación debe ser único.",
+                        max_length=128,
+                        unique=True,
+                        verbose_name="Nombre",
+                    ),
+                ),
+                (
+                    "room_type",
+                    models.CharField(
+                        choices=[
+                            ("DORM", "Dormitorio compartido"),
+                            ("PRIVATE", "Habitación privada"),
+                            ("CABIN", "Cabaña"),
+                            ("APARTMENT", "Apartamento"),
+                            ("STUDIO", "Estudio"),
+                            ("SUITE", "Suite"),
+                            ("DELUXE", "Habitación deluxe"),
+                            ("BUNGALOW", "Bungalow"),
+                            ("VILLA", "Villa"),
+                            ("COTTAGE", "Casa rural"),
+                            ("CAMPING", "Zona de camping"),
+                            ("GLAMPING", "Glamping"),
+                            ("LOFT", "Loft"),
+                            ("MOBILE_HOME", "Casa móvil"),
+                            ("TENT", "Tienda de campaña preparada"),
+                            ("IGLOO", "Iglú"),
+                            ("TREEHOUSE", "Casa en el árbol"),
+                            ("YURT", "Yurta"),
+                            ("TINY_HOUSE", "Casa pequeña"),
+                            ("RV_SPOT", "Espacio para autocaravana"),
+                            ("DORM_FEMALE", "Dormitorio femenino"),
+                            ("DORM_MALE", "Dormitorio masculino"),
+                            ("DORM_MIXED", "Dormitorio mixto"),
+                            ("FAMILY_ROOM", "Habitación familiar"),
+                        ],
+                        max_length=32,
+                        verbose_name="Tipo de habitación",
+                    ),
+                ),
+                (
+                    "capacity",
+                    models.IntegerField(
+                        blank=True, default=1, verbose_name="Capacidad"
+                    ),
+                ),
+                (
+                    "base_price",
+                    models.DecimalField(
+                        decimal_places=2,
+                        default=0.0,
+                        max_digits=10,
+                        verbose_name="Precio base",
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True,
+                        help_text="Descripción de la habitación (baño privado, comodidades, etc.)",
+                        verbose_name="Descripción",
+                    ),
+                ),
+                ("is_active", models.BooleanField(default=True, verbose_name="Activo")),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'verbose_name': 'Habitación',
-                'verbose_name_plural': 'Habitaciones',
-                'ordering': ['name'],
+                "verbose_name": "Habitación",
+                "verbose_name_plural": "Habitaciones",
+                "ordering": ["name"],
             },
         ),
         migrations.CreateModel(
-            name='Unit',
+            name="Unit",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(blank=True, max_length=128, null=True, verbose_name='Identificacion de unidad')),
-                ('unit_type', models.CharField(choices=[('SINGLE_BED', 'Cama individual'), ('BUNK_TOP', 'Litera superior'), ('BUNK_BOTTOM', 'Litera inferior'), ('DOUBLE_BED', 'Cama doble'), ('QUEEN_BED', 'Cama queen'), ('KING_BED', 'Cama king'), ('BASIC_CABIN', 'Cabaña básica'), ('STANDARD_CABIN', 'Cabaña estándar'), ('DELUXE_CABIN', 'Cabaña deluxe'), ('STUDIO_UNIT', 'Unidad estudio'), ('ONE_BEDROOM', 'Una habitación'), ('TWO_BEDROOM', 'Dos habitaciones'), ('PENTHOUSE', 'Ático'), ('TENT_SPACE', 'Espacio para tienda'), ('CAMPER_SPACE', 'Espacio para caravana'), ('HAMMOCK', 'Hamaca'), ('POD', 'Cápsula para dormir'), ('HAMMOCK', 'Hamaca'), ('TENT_PLATFORM', 'Plataforma para tienda'), ('AIRSTREAM', 'Airstream'), ('TEEPEE', 'Tipi'), ('ENTIRE_ROOM', 'Habitación completa'), ('ENTIRE_CABIN', 'Cabaña completa'), ('ENTIRE_VILLA', 'Villa completa'), ('ENTIRE_HOUSE', 'Casa completa')], default='SINGLE', max_length=32, verbose_name='Tipo de cama')),
-                ('is_active', models.BooleanField(default=True, verbose_name='Activo')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('room', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='units', to='rooms.room', verbose_name='Habitación')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        max_length=128,
+                        null=True,
+                        verbose_name="Identificacion de unidad",
+                    ),
+                ),
+                (
+                    "unit_type",
+                    models.CharField(
+                        choices=[
+                            ("SINGLE_BED", "Cama individual"),
+                            ("BUNK_TOP", "Litera superior"),
+                            ("BUNK_BOTTOM", "Litera inferior"),
+                            ("DOUBLE_BED", "Cama doble"),
+                            ("QUEEN_BED", "Cama queen"),
+                            ("KING_BED", "Cama king"),
+                            ("BASIC_CABIN", "Cabaña básica"),
+                            ("STANDARD_CABIN", "Cabaña estándar"),
+                            ("DELUXE_CABIN", "Cabaña deluxe"),
+                            ("STUDIO_UNIT", "Unidad estudio"),
+                            ("ONE_BEDROOM", "Una habitación"),
+                            ("TWO_BEDROOM", "Dos habitaciones"),
+                            ("PENTHOUSE", "Ático"),
+                            ("TENT_SPACE", "Espacio para tienda"),
+                            ("CAMPER_SPACE", "Espacio para caravana"),
+                            ("HAMMOCK", "Hamaca"),
+                            ("POD", "Cápsula para dormir"),
+                            ("HAMMOCK", "Hamaca"),
+                            ("TENT_PLATFORM", "Plataforma para tienda"),
+                            ("AIRSTREAM", "Airstream"),
+                            ("TEEPEE", "Tipi"),
+                            ("ENTIRE_ROOM", "Habitación completa"),
+                            ("ENTIRE_CABIN", "Cabaña completa"),
+                            ("ENTIRE_VILLA", "Villa completa"),
+                            ("ENTIRE_HOUSE", "Casa completa"),
+                        ],
+                        default="SINGLE",
+                        max_length=32,
+                        verbose_name="Tipo de cama",
+                    ),
+                ),
+                ("is_active", models.BooleanField(default=True, verbose_name="Activo")),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "room",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="units",
+                        to="rooms.room",
+                        verbose_name="Habitación",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Unidad',
-                'verbose_name_plural': 'Unidades',
-                'unique_together': {('room', 'name')},
+                "verbose_name": "Unidad",
+                "verbose_name_plural": "Unidades",
+                "unique_together": {("room", "name")},
             },
         ),
     ]

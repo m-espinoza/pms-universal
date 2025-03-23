@@ -10,26 +10,97 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('bookings', '0001_initial'),
+        ("bookings", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Payment',
+            name="Payment",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('amount', models.DecimalField(decimal_places=2, max_digits=10, validators=[django.core.validators.MinValueValidator(0.01)], verbose_name='Monto')),
-                ('payment_date', models.DateTimeField(auto_now_add=True, verbose_name='Fecha de pago')),
-                ('payment_method', models.CharField(choices=[('CASH', 'Efectivo'), ('CREDIT_CARD', 'Tarjeta de crédito'), ('DEBIT_CARD', 'Tarjeta de débito'), ('BANK_TRANSFER', 'Transferencia bancaria'), ('PAYPAL', 'PayPal'), ('QR', 'QR'), ('OTHER', 'Otro')], default='CASH', max_length=20, verbose_name='Método de pago')),
-                ('status', models.CharField(choices=[('PENDING', 'Pendiente'), ('COMPLETED', 'Completado'), ('FAILED', 'Fallido'), ('REFUNDED', 'Reembolsado'), ('PARTIALLY_REFUNDED', 'Parcialmente reembolsado')], default='PENDING', max_length=20, verbose_name='Estado')),
-                ('transaction_id', models.CharField(blank=True, help_text='Identificador único de la transacción para pagos electrónicos', max_length=100, null=True, verbose_name='ID de transacción')),
-                ('notes', models.TextField(blank=True, null=True, verbose_name='Notas')),
-                ('booking', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='payments', to='bookings.booking', verbose_name='Reserva')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "amount",
+                    models.DecimalField(
+                        decimal_places=2,
+                        max_digits=10,
+                        validators=[django.core.validators.MinValueValidator(0.01)],
+                        verbose_name="Monto",
+                    ),
+                ),
+                (
+                    "payment_date",
+                    models.DateTimeField(
+                        auto_now_add=True, verbose_name="Fecha de pago"
+                    ),
+                ),
+                (
+                    "payment_method",
+                    models.CharField(
+                        choices=[
+                            ("CASH", "Efectivo"),
+                            ("CREDIT_CARD", "Tarjeta de crédito"),
+                            ("DEBIT_CARD", "Tarjeta de débito"),
+                            ("BANK_TRANSFER", "Transferencia bancaria"),
+                            ("PAYPAL", "PayPal"),
+                            ("QR", "QR"),
+                            ("OTHER", "Otro"),
+                        ],
+                        default="CASH",
+                        max_length=20,
+                        verbose_name="Método de pago",
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("PENDING", "Pendiente"),
+                            ("COMPLETED", "Completado"),
+                            ("FAILED", "Fallido"),
+                            ("REFUNDED", "Reembolsado"),
+                            ("PARTIALLY_REFUNDED", "Parcialmente reembolsado"),
+                        ],
+                        default="PENDING",
+                        max_length=20,
+                        verbose_name="Estado",
+                    ),
+                ),
+                (
+                    "transaction_id",
+                    models.CharField(
+                        blank=True,
+                        help_text="Identificador único de la transacción para pagos electrónicos",
+                        max_length=100,
+                        null=True,
+                        verbose_name="ID de transacción",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(blank=True, null=True, verbose_name="Notas"),
+                ),
+                (
+                    "booking",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="payments",
+                        to="bookings.booking",
+                        verbose_name="Reserva",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Pago',
-                'verbose_name_plural': 'Pagos',
-                'ordering': ['-payment_date'],
+                "verbose_name": "Pago",
+                "verbose_name_plural": "Pagos",
+                "ordering": ["-payment_date"],
             },
         ),
     ]

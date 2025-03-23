@@ -6,10 +6,10 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 
-from rooms.models import Unit, Room
 from bookings.models import Booking
 from guests.models import Guest
 from payments.models import CashRegisterEntry, Payment
+from rooms.models import Room, Unit
 
 
 class PaymentModelTest(TestCase):
@@ -29,7 +29,7 @@ class PaymentModelTest(TestCase):
         self.unit = Unit.objects.create(
             name="1",
             unit_type="SINGLE",
-            room=self.room,            
+            room=self.room,
             is_active=True,
         )
 
@@ -382,7 +382,7 @@ class CashRegisterEntryTest(TestCase):
         self.unit = Unit.objects.create(
             name="1",
             unit_type="SINGLE",
-            room=self.room,            
+            room=self.room,
             is_active=True,
         )
 
