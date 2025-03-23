@@ -4,17 +4,32 @@ from django.utils.translation import gettext_lazy as _
 
 class Room(models.Model):
     ROOM_TYPES = [
-    ("CABIN", _("Cabaña")),  # Todas las unidades en esta categoría son cabañas
-    ("DORM", _("Dormitorio compartido")),  # Todas las unidades son camas en un dormitorio compartido
-    ("GLAMPING", _("Glamping")),  # Todas las unidades son espacios de glamping
-    ("CAMPING", _("Zona de camping")),  # Todas las unidades son espacios para acampar
-    ("PRIVATE_ROOM", _("Habitación privada")),  # Todas las unidades son habitaciones privadas
-    ("SPECIAL_ROOM", _("Dormitorio especial")),  # Todas las unidades son dormitorios especiales
-    ("APARTMENT", _("Apartamento")),  # Todas las unidades son apartamentos
-    ("VILLA", _("Villa")),  # Todas las unidades son villas
-    ("TENT", _("Tienda de campaña preparada")),  # Todas las unidades son tiendas preparadas
-    ("OTHER", _("Otro tipo de alojamiento")),  # Para categorías no especificadas
-]
+        ("CABIN", _("Cabaña")),  # Todas las unidades en esta categoría son cabañas
+        (
+            "DORM",
+            _("Dormitorio compartido"),
+        ),  # Todas las unidades son camas en un dormitorio compartido
+        ("GLAMPING", _("Glamping")),  # Todas las unidades son espacios de glamping
+        (
+            "CAMPING",
+            _("Zona de camping"),
+        ),  # Todas las unidades son espacios para acampar
+        (
+            "PRIVATE_ROOM",
+            _("Habitación privada"),
+        ),  # Todas las unidades son habitaciones privadas
+        (
+            "SPECIAL_ROOM",
+            _("Dormitorio especial"),
+        ),  # Todas las unidades son dormitorios especiales
+        ("APARTMENT", _("Apartamento")),  # Todas las unidades son apartamentos
+        ("VILLA", _("Villa")),  # Todas las unidades son villas
+        (
+            "TENT",
+            _("Tienda de campaña preparada"),
+        ),  # Todas las unidades son tiendas preparadas
+        ("OTHER", _("Otro tipo de alojamiento")),  # Para categorías no especificadas
+    ]
 
     name = models.CharField(
         max_length=128,
