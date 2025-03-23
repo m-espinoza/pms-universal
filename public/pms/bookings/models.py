@@ -5,7 +5,7 @@ from django.db import models
 from django.db.models import Q, Sum
 from django.utils.translation import gettext_lazy as _
 
-from beds.models import Bed
+from rooms.models import Unit
 from guests.models import Guest
 
 
@@ -25,11 +25,11 @@ class Booking(models.Model):
         verbose_name=_("Huésped"),
     )
 
-    bed = models.ForeignKey(
-        Bed,
+    unit = models.ForeignKey(
+        Unit,
         on_delete=models.CASCADE,
         related_name="bookings",
-        verbose_name=_("Cama"),  # noqa
+        verbose_name=_("Unidad"),  # noqa
     )
 
     check_in_date = models.DateField(verbose_name=_("Fecha de entrada"))
@@ -58,12 +58,12 @@ class Booking(models.Model):
         verbose_name_plural = _("Reservas")
         # Índices para mejorar el rendimiento de las búsquedas
         indexes = [
-            models.Index(fields=["bed", "check_in_date", "check_out_date"]),
+            models.Index(fields=["unit", "check_in_date", "check_out_date"]),
             models.Index(fields=["status"]),
         ]
 
     def __str__(self):
-        return f"{self.guest} - {self.bed} ({self.check_in_date} to {self.check_out_date})"  # noqa
+        return f"{self.guest} - {self.unit} ({self.check_in_date} to {self.check_out_date})"  # noqa
 
     def clean(self):
         """Validaciones personalizadas para la reserva"""
@@ -87,17 +87,17 @@ class Booking(models.Model):
             )
 
         # Validar disponibilidad de la cama
-        if not self.is_bed_available():
+        if not self.is_unit_available():
             raise ValidationError(
                 _("Esta cama no está disponible para las fechas seleccionadas")
             )  # noqa
 
-    def is_bed_available(self):
+    def is_unit_available(self):
         """
         Verifica si la cama está disponible para las fechas seleccionadas
         """
         overlapping_bookings = Booking.objects.filter(
-            bed=self.bed,
+            unit=self.unit,
             status__in=["PENDING", "CONFIRMED", "CHECKED_IN"],
         ).filter(
             # Busca superposición de fechas
@@ -116,7 +116,7 @@ class Booking(models.Model):
         if not self.total_price:
             # Calcular el precio total si no está establecido
             nights = (self.check_out_date - self.check_in_date).days
-            self.total_price = self.bed.base_price * nights
+            self.total_price = self.room.base_price * nights
         super().save(*args, **kwargs)
 
     def confirm_booking(self):

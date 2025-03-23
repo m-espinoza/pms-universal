@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 
-from beds.models import Bed, Room
+from rooms.models import Unit, Room
 from bookings.models import Booking
 from guests.models import Guest
 from payments.models import CashRegisterEntry, Payment
@@ -25,9 +25,9 @@ class PaymentModelTest(TestCase):
             is_active=True,
         )
 
-        self.bed = Bed.objects.create(
+        self.unit = Unit.objects.create(
             number=1,
-            bed_type="SINGLE",
+            unit_type="SINGLE",
             room=self.room,
             base_price=20.00,
             is_active=True,
@@ -46,7 +46,7 @@ class PaymentModelTest(TestCase):
         # Crear una reserva para 3 días
         self.booking = Booking.objects.create(
             guest=self.guest,
-            bed=self.bed,
+            unit=self.unit,
             check_in_date=timezone.now().date() + datetime.timedelta(days=1),
             check_out_date=timezone.now().date() + datetime.timedelta(days=4),
             status="PENDING",
@@ -378,9 +378,9 @@ class CashRegisterEntryTest(TestCase):
             is_active=True,
         )
 
-        self.bed = Bed.objects.create(
+        self.unit = Unit.objects.create(
             number=1,
-            bed_type="SINGLE",
+            unit_type="SINGLE",
             room=self.room,
             base_price=20.00,
             is_active=True,
@@ -398,7 +398,7 @@ class CashRegisterEntryTest(TestCase):
 
         self.booking = Booking.objects.create(
             guest=self.guest,
-            bed=self.bed,
+            unit=self.unit,
             check_in_date=timezone.now().date() + datetime.timedelta(days=1),
             check_out_date=timezone.now().date() + datetime.timedelta(days=4),
             status="PENDING",

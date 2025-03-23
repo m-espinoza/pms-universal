@@ -24,7 +24,7 @@ class UnitAdmin(admin.ModelAdmin):
     ordering = ('room', 'name')
     fieldsets = (
         (None, {
-            'fields': ('name', 'bed_type', 'room', 'is_active')
+            'fields': ('name', 'unit_type', 'room', 'is_active')
         }),
     )
     readonly_fields = ('created_at', 'updated_at')

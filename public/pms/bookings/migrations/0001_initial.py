@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('beds', '0002_remove_room_base_price'),
+        ('rooms', '0001_initial'),
         ('guests', '0001_initial'),
     ]
 
