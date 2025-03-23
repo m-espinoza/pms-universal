@@ -15,23 +15,64 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Guest',
+            name="Guest",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100, verbose_name='name')),
-                ('document_type', models.CharField(choices=[('DNI', 'National ID'), ('PASSPORT', 'Passport')], max_length=8, verbose_name='document type')),
-                ('document_number', models.CharField(max_length=20, verbose_name='document number')),
-                ('birth_date', models.DateField(blank=True, null=True, verbose_name='birth date')),
-                ('phone_number', models.CharField(max_length=20, verbose_name='phone number')),
-                ('nationality', models.CharField(max_length=50, verbose_name='nationality')),
-                ('email', models.EmailField(blank=True, max_length=254, null=True, verbose_name='email')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('reservation_owner', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL, verbose_name='reservation owner')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100, verbose_name="name")),
+                (
+                    "document_type",
+                    models.CharField(
+                        choices=[("DNI", "National ID"), ("PASSPORT", "Passport")],
+                        max_length=8,
+                        verbose_name="document type",
+                    ),
+                ),
+                (
+                    "document_number",
+                    models.CharField(max_length=20, verbose_name="document number"),
+                ),
+                (
+                    "birth_date",
+                    models.DateField(blank=True, null=True, verbose_name="birth date"),
+                ),
+                (
+                    "phone_number",
+                    models.CharField(max_length=20, verbose_name="phone number"),
+                ),
+                (
+                    "nationality",
+                    models.CharField(max_length=50, verbose_name="nationality"),
+                ),
+                (
+                    "email",
+                    models.EmailField(
+                        blank=True, max_length=254, null=True, verbose_name="email"
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "reservation_owner",
+                    models.OneToOneField(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="reservation owner",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'guest',
-                'verbose_name_plural': 'guests',
+                "verbose_name": "guest",
+                "verbose_name_plural": "guests",
             },
         ),
     ]

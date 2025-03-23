@@ -6,13 +6,25 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('payments', '0004_remove_cashregisterentry_created_by_and_more'),
+        ("payments", "0004_remove_cashregisterentry_created_by_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='payment',
-            name='payment_method',
-            field=models.CharField(choices=[('CASH', 'Efectivo'), ('CREDIT_CARD', 'Tarjeta de crédito'), ('DEBIT_CARD', 'Tarjeta de débito'), ('BANK_TRANSFER', 'Transferencia bancaria'), ('QR', 'QR'), ('OTHER', 'Otro')], default='CASH', max_length=20, verbose_name='Método de pago'),
+            model_name="payment",
+            name="payment_method",
+            field=models.CharField(
+                choices=[
+                    ("CASH", "Efectivo"),
+                    ("CREDIT_CARD", "Tarjeta de crédito"),
+                    ("DEBIT_CARD", "Tarjeta de débito"),
+                    ("BANK_TRANSFER", "Transferencia bancaria"),
+                    ("QR", "QR"),
+                    ("OTHER", "Otro"),
+                ],
+                default="CASH",
+                max_length=20,
+                verbose_name="Método de pago",
+            ),
         ),
     ]
