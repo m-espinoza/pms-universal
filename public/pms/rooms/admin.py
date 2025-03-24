@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Room, Unit, Plan
+from .models import Plan, Room, Unit
 
 
 @admin.register(Room)
@@ -47,14 +47,36 @@ class UnitAdmin(admin.ModelAdmin):
     )
     readonly_fields = ("created_at", "updated_at")
 
+
 @admin.register(Plan)
 class PlanAdmin(admin.ModelAdmin):
-    list_display = ("name", "room", "start_date", "end_date", "price", "is_active", "created_at")
+    list_display = (
+        "name",
+        "room",
+        "start_date",
+        "end_date",
+        "price",
+        "is_active",
+        "created_at",
+    )  # noqa
     list_filter = ("room", "is_active")
     search_fields = ("name", "room__name")
     date_hierarchy = "created_at"
     ordering = ("room", "name")
     fieldsets = (
-        (None, {"fields": ("name", "room", "start_date", "end_date", "description", "price", "is_active")}),  # noqa
+        (
+            None,
+            {
+                "fields": (
+                    "name",
+                    "room",
+                    "start_date",
+                    "end_date",
+                    "description",
+                    "price",
+                    "is_active",
+                )
+            },
+        ),  # noqa
     )
     readonly_fields = ("created_at", "updated_at")
