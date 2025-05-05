@@ -2,6 +2,60 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+class Property(models.Model):
+    PROPERTY_TYPES = [
+        ("HOTEL", _("Hotel")),
+        ("HOSTEL", _("Hostal/Albergue")),
+        ("CAMPING", _("Camping")),
+        ("RESORT", _("Resort/Complejo turístico")),
+        ("APARTMENT", _("Hotel apartamento/Apart-hotel")),
+        ("BNB", _("Bed and Breakfast")),
+        ("GUESTHOUSE", _("Casa de huéspedes")),
+        ("BOUTIQUE", _("Hotel boutique")),
+        ("ECOLODGE", _("Eco-lodge/Alojamiento ecológico")),
+        ("VACATION_RENTAL", _("Alquiler vacacional")),
+        ("GLAMPING", _("Glamping")),
+        ("OTHER", _("Otro tipo de alojamiento")),
+    ]
+
+    name = models.CharField(
+        max_length=128,
+        verbose_name=_("Nombre"),
+        help_text=_("El nombre de la propiedad debe ser único."),
+        unique=True,
+    )
+
+    property_type = models.CharField(
+        max_length=32, 
+        choices=PROPERTY_TYPES, 
+        verbose_name=_("Tipo de propiedad")
+    )
+
+    description = models.TextField(
+        blank=True,
+        verbose_name=_("Descripción"),
+        help_text=_("Descripción general de la propiedad"),
+    )
+
+    address = models.TextField(
+        blank=True,
+        verbose_name=_("Dirección"),
+        help_text=_("Dirección física de la propiedad"),
+    )
+
+    is_active = models.BooleanField(default=True, verbose_name=_("Activo")) # noqa
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _("Propiedad")
+        verbose_name_plural = _("Propiedades")
+        ordering = ["name"]
+
+    def __str__(self):
+        return f"{self.name} ({self.get_property_type_display()})" # noqa
 
 class Room(models.Model):
     ROOM_TYPES = [
@@ -17,15 +71,21 @@ class Room(models.Model):
         ("OTHER", _("Otro tipo de alojamiento")),
     ]
 
+    property = models.ForeignKey(
+        Property,
+        on_delete=models.CASCADE,
+        related_name="rooms",
+        verbose_name=_("Propiedad"),
+    )
+
     name = models.CharField(
         max_length=128,
         verbose_name=_("Nombre"),
-        help_text=_("El nombre de la habitación debe ser único."),
-        unique=True,
+        help_text=_("El nombre de la habitación debe ser único dentro de la propiedad.") # noqa
     )
 
     room_type = models.CharField(
-        max_length=32, choices=ROOM_TYPES, verbose_name=_("Tipo de habitación")
+        max_length=32, choices=ROOM_TYPES, verbose_name=_("Tipo de habitación") # noqa
     )
 
     capacity = models.IntegerField(
