@@ -1,34 +1,86 @@
-# PMS hostels
+# Django Ayudamemoria
 
-## Imagenes Utilizadas:
-- PostgreSQL
-- Django
+## Docker + Django + PostgreSQL
 
-## Minitutorial django
-- Generar el archivo **.env** basandose en **.env.example**
-- Ejecutas **docker-compose up --build**
-- Postgresql [demora en genrar la db ](https://github.com/docker-library/docs/blob/master/postgres/README.md#caveats) lo que hace que cuando django quiera conectarse no la va a encontrar, debes hacer un restart al contenedor **cobra_system** para que se conecte a la db ya creada.
-- Luego entrar en **cobra_system** y ejecutar **python ./sistema_cobranza/manage.py migrate** para generar las tablas en la db
-- Crear admin **python manage.py createsuperuser**
+```bash
+# Configuración inicial
+cp .env.example .env
+docker-compose up --build
+# Si Django no se conecta a PostgreSQL (normal)
+docker restart cobra_system
+# Dentro del contenedor
+docker exec -it cobra_system bash
+python ./sistema_cobranza/manage.py migrate
+python manage.py createsuperuser
 
-## Mini tutorial de DJANGO para generar un proyecto nuevo
-- **django-admin startproject mysite** - Generar carpeta de proyecto
-- **python manage.py runserver 0:80** - Correr servidor
-- **python manage.py startapp polls** - Crear Apliación
-- configurar setings.py en project
-- agregar vistas en app
-- configurar urls en project y app
-- Configuro INSTALLED_APPS en config.py para que la migracion tenga en cuenta a la app
-- **python manage.py migrate** - Genera migración de tablas por defecto
-- Hacer el modelo
-- **python manage.py makemigrations (nombre app)** - Genero los archivos de migración
-- **python manage.py sqlmigrate (nombre app) 0001** - Reviso el sql generado
-- **python manage.py migrate** - Aplico modelo
-- **python manage.py createsuperuser**
-- Toda la info de como hacer querys con el modelo: https://docs.djangoproject.com/es/3.2/ref/models/querysets/
-- Info sobre usuarios de django https://docs.djangoproject.com/en/3.2/topics/auth/default/#authentication-in-web-requests
-- Tutorial de DJANGO en video: https://youtube.com/playlist?list=PLEsfXFp6DpzTD1BD1aWNxS2Ep06vIkaeW
-- En caso de tener poblemas con las variables estatiacas esto las resetea `docker-compose -f docker-compose.prod.yml exec cobra_system python manage.py collectstatic --no-input --clear`
-- Tutorial nginx: https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/#nginx
-- Tutorial token simple: https://simpleisbetterthancomplex.com/tutorial/2018/11/22/how-to-implement-token-authentication-using-django-rest-framework.html 
-- Tutorial token avanzado: https://james1345.github.io/django-rest-knox/
+# Resetear estáticos (producción)
+docker-compose -f docker-compose.prod.yml exec cobra_system python manage.py collectstatic --no-input --clear
+```
+
+## Nuevo Proyecto Django
+
+```bash
+# Crear proyecto y app
+django-admin startproject mysite
+python manage.py startapp polls
+
+# Servidor desarrollo
+python manage.py runserver 0:80
+
+# Base de datos
+python manage.py migrate                     # Aplicar migraciones iniciales
+python manage.py makemigrations polls        # Crear migraciones
+python manage.py sqlmigrate polls 0001       # Ver SQL generado
+python manage.py migrate                     # Aplicar migraciones
+
+# Admin
+python manage.py createsuperuser
+```
+
+## Flujo de Trabajo
+1. Configurar settings.py (BD, INSTALLED_APPS)
+2. Crear modelos en models.py
+3. Registrar en admin.py
+4. Configurar urls.py (proyecto y app)
+5. Crear views.py
+
+## ORM (Consultas)
+
+```python
+# Básicas
+Model.objects.all()
+Model.objects.filter(campo='valor')
+Model.objects.get(id=1)
+
+# Crear/Editar
+obj = Model(campo='valor')
+obj.save()
+Model.objects.create(campo='valor')
+Model.objects.get(id=1).delete()
+
+# Avanzadas
+from django.db.models import Q
+Model.objects.filter(Q(campo1='valor1') | Q(campo2='valor2'))
+```
+
+## Autenticación
+
+```python
+# Decorador para proteger vistas
+@login_required
+
+# Token (settings.py)
+INSTALLED_APPS = [
+    'rest_framework',
+    'rest_framework.authtoken',  # Simple
+    'knox',                      # Avanzado
+]
+```
+
+## Enlaces Útiles
+- [QuerySet API](https://docs.djangoproject.com/es/3.2/ref/models/querysets/)
+- [Autenticación](https://docs.djangoproject.com/en/3.2/topics/auth/default/)
+- [Video Tutorial](https://youtube.com/playlist?list=PLEsfXFp6DpzTD1BD1aWNxS2Ep06vIkaeW)
+- [Token Simple](https://simpleisbetterthancomplex.com/tutorial/2018/11/22/how-to-implement-token-authentication-using-django-rest-framework.html)
+- [Token Knox](https://james1345.github.io/django-rest-knox/)
+- [Nginx + Django](https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/#nginx)
