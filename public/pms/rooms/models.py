@@ -117,6 +117,7 @@ class Room(models.Model):
         verbose_name = _("Habitación")
         verbose_name_plural = _("Habitaciones")
         ordering = ["name"]
+        unique_together = ["property", "name"] 
 
     def __str__(self):
         return f"{_('Habitación')} {self.name} ({self.get_room_type_display()})"  # noqa
