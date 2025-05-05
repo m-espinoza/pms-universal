@@ -9,15 +9,24 @@ from django.utils import timezone
 from bookings.models import Booking
 from guests.models import Guest
 from payments.models import CashRegisterEntry, Payment
-from rooms.models import Room, Unit
+from rooms.models import Property, Room, Unit
 
 
 class PaymentModelTest(TestCase):
     """Pruebas para el modelo Payment con soporte para reembolsos."""
 
     def setUp(self):
+
+        # Crear primero una propiedad
+        self.property = Property.objects.create(
+            name="Hotel Example",
+            property_type="HOTEL",
+            description="A test hotel"
+        )
+
         # Crear datos de prueba
         self.room = Room.objects.create(
+            property=self.property,
             name="Habitación 101",
             room_type="DORM",
             capacity=4,
@@ -369,8 +378,16 @@ class CashRegisterEntryTest(TestCase):
     """Pruebas para el modelo CashRegisterEntry con soporte para reembolsos."""
 
     def setUp(self):
+
+        # Crear primero una propiedad
+        self.property = Property.objects.create(
+            name="Hotel Example",
+            property_type="HOTEL",
+            description="A test hotel"
+        )
         # Crear datos de prueba
         self.room = Room.objects.create(
+            property=self.property,
             name="Habitación 101",
             room_type="DORM",
             capacity=4,
