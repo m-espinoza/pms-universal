@@ -5,14 +5,23 @@ from django.test import TestCase
 
 from bookings.models import Booking
 from guests.models import Guest
-from rooms.models import Room, Unit
+from rooms.models import Property, Room, Unit
 
 
 class BookingModelTest(TestCase):
     def setUp(self):
         # Configuración común para las pruebas
+        # Crear primero una propiedad
+        self.property = Property.objects.create(
+            name="Hotel Example",
+            property_type="HOTEL",
+            description="A test hotel"
+        )
         self.room = Room.objects.create(
-            name="Room 101", room_type="PRIVATE", base_price=100
+            property=self.property,
+            name="Room 101",
+            room_type="PRIVATE",
+            base_price=100
         )
         self.unit = Unit.objects.create(
             name="1", unit_type="SINGLE", room=self.room
