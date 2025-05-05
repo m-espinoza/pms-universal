@@ -12,9 +12,9 @@ class PlanModelTest(TestCase):
         self.property = Property.objects.create(
             name="Resort Example",
             property_type="RESORT",
-            description="A test resort"
+            description="A test resort",  # noqa
         )
-        
+
         # Create room for the plan, associated with the property
         self.room = Room.objects.create(
             property=self.property,
@@ -26,9 +26,7 @@ class PlanModelTest(TestCase):
 
         # create unit in room for the plan
         self.unit = Unit.objects.create(
-            room=self.room,
-            name="Unit 101",
-            unit_type="QUEEN_BED"
+            room=self.room, name="Unit 101", unit_type="QUEEN_BED"
         )
 
         # Common setup for tests
@@ -68,7 +66,7 @@ class PlanModelTest(TestCase):
         self.plan.delete()
         with self.assertRaises(Plan.DoesNotExist):
             Plan.objects.get(id=plan_id)
-            
+
         # Verificar que la habitación, unidad y propiedad siguen existiendo
         self.assertTrue(Room.objects.filter(id=self.room.id).exists())
         self.assertTrue(Unit.objects.filter(id=self.unit.id).exists())
@@ -108,46 +106,43 @@ class PlanModelTest(TestCase):
     def test_multiple_properties_and_plans(self):
         # Crear una segunda propiedad
         property2 = Property.objects.create(
-            name="Hostel Example",
-            property_type="HOSTEL"
+            name="Hostel Example", property_type="HOSTEL"
         )
-        
+
         # Crear una habitación en la segunda propiedad
         room2 = Room.objects.create(
             property=property2,
             name="Room 101",  # Mismo nombre pero diferente propiedad
             room_type="DORM",
             capacity=8,
-            base_price=50.00
+            base_price=50.00,
         )
-        
+
         # Crear un plan para la segunda habitación
         plan2 = Plan.objects.create(
             name="Plan Economy",  # Nombre diferente al primer plan
             room=room2,
             price=200.00,
             start_date=datetime.date(2025, 1, 1),
-            end_date=datetime.date(2025, 1, 31)
+            end_date=datetime.date(2025, 1, 31),
         )
-        
+
         # Verificar que ambos planes existen y tienen relaciones correctas
         self.assertEqual(Plan.objects.count(), 2)
         self.assertEqual(plan2.room.property.name, "Hostel Example")
-        
+
         # Verificar que los planes funcionan independientemente
         # para diferentes propiedades
         unit2 = Unit.objects.create(
-            room=room2,
-            name="Bed 1",
-            unit_type="BUNK_BED"
-        )
-        
+            room=room2, name="Bed 1", unit_type="BUNK_BED"
+        )  # noqa
+
         price_property1 = Plan.get_price_room(
             self.unit, datetime.date(2025, 1, 15), datetime.date(2025, 1, 20)
         )
         price_property2 = Plan.get_price_room(
             unit2, datetime.date(2025, 1, 15), datetime.date(2025, 1, 20)
         )
-        
+
         self.assertEqual(price_property1, 400.00)
         self.assertEqual(price_property2, 200.00)

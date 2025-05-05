@@ -2,6 +2,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+
 class Property(models.Model):
     PROPERTY_TYPES = [
         ("HOTEL", _("Hotel")),
@@ -26,9 +27,9 @@ class Property(models.Model):
     )
 
     property_type = models.CharField(
-        max_length=32, 
-        choices=PROPERTY_TYPES, 
-        verbose_name=_("Tipo de propiedad")
+        max_length=32,
+        choices=PROPERTY_TYPES,
+        verbose_name=_("Tipo de propiedad"),  # noqa
     )
 
     description = models.TextField(
@@ -43,7 +44,7 @@ class Property(models.Model):
         help_text=_("Dirección física de la propiedad"),
     )
 
-    is_active = models.BooleanField(default=True, verbose_name=_("Activo")) # noqa
+    is_active = models.BooleanField(default=True, verbose_name=_("Activo"))  # noqa
 
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -55,7 +56,8 @@ class Property(models.Model):
         ordering = ["name"]
 
     def __str__(self):
-        return f"{self.name} ({self.get_property_type_display()})" # noqa
+        return f"{self.name} ({self.get_property_type_display()})"  # noqa
+
 
 class Room(models.Model):
     ROOM_TYPES = [
@@ -81,11 +83,13 @@ class Room(models.Model):
     name = models.CharField(
         max_length=128,
         verbose_name=_("Nombre"),
-        help_text=_("El nombre de la habitación debe ser único dentro de la propiedad.") # noqa
+        help_text=_(
+            "El nombre de la habitación debe ser único dentro de la propiedad."
+        ),  # noqa
     )
 
     room_type = models.CharField(
-        max_length=32, choices=ROOM_TYPES, verbose_name=_("Tipo de habitación") # noqa
+        max_length=32, choices=ROOM_TYPES, verbose_name=_("Tipo de habitación")  # noqa
     )
 
     capacity = models.IntegerField(
@@ -117,7 +121,7 @@ class Room(models.Model):
         verbose_name = _("Habitación")
         verbose_name_plural = _("Habitaciones")
         ordering = ["name"]
-        unique_together = ["property", "name"] 
+        unique_together = ["property", "name"]
 
     def __str__(self):
         return f"{_('Habitación')} {self.name} ({self.get_room_type_display()})"  # noqa

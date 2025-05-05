@@ -51,20 +51,20 @@ class PropertyModelTest(TestCase):
             property=self.property,
             name="101",
             room_type="PRIVATE_ROOM",
-            capacity=2
+            capacity=2,  # noqa
         )
         Room.objects.create(
             property=self.property,
             name="102",
             room_type="PRIVATE_ROOM",
-            capacity=2
+            capacity=2,  # noqa
         )
 
         # Verificar que la propiedad tiene habitaciones
         self.assertEqual(self.property.rooms.count(), 2)
-        
+
         # Verificar que podemos acceder a las habitaciones desde la propiedad
-        room_names = list(self.property.rooms.values_list('name', flat=True))
+        room_names = list(self.property.rooms.values_list("name", flat=True))
         self.assertIn("101", room_names)
         self.assertIn("102", room_names)
 
@@ -77,7 +77,7 @@ class PropertyModelTest(TestCase):
             property=self.property,
             name="101",
             room_type="PRIVATE_ROOM",
-            capacity=2
+            capacity=2,  # noqa
         )
 
         # Guardar el ID de la habitación

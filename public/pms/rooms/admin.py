@@ -36,23 +36,23 @@ class PropertyAdmin(admin.ModelAdmin):
 class RoomAdmin(admin.ModelAdmin):
     list_display = (
         "name",
-        "property",  # Añadido property
+        "property",
         "room_type",
         "base_price",
         "capacity",
         "is_active",
         "created_at",
     )
-    list_filter = ("property", "room_type", "is_active")  # Añadido property al filtro
-    search_fields = ("name", "description", "property__name")  # Añadido búsqueda por property
+    list_filter = ("property", "room_type", "is_active")
+    search_fields = ("name", "description", "property__name")
     date_hierarchy = "created_at"
-    ordering = ("property", "name")  # Ordenar primero por property
+    ordering = ("property", "name")
     fieldsets = (
         (
             None,
             {
                 "fields": (
-                    "property",  # Añadido property en el formulario
+                    "property",
                     "name",
                     "room_type",
                     "capacity",
@@ -68,17 +68,18 @@ class RoomAdmin(admin.ModelAdmin):
 
 @admin.register(Unit)
 class UnitAdmin(admin.ModelAdmin):
-    list_display = ("name", "unit_type", "room", "is_active", "created_at")
-    list_filter = ("unit_type", "room__property", "room", "is_active")  # Filtro por property de la room
-    search_fields = ("name", "room__name", "room__property__name")  # Búsqueda por property
+    list_display = ("name", "unit_type", "room", "is_active", "created_at")  # noqa
+    list_filter = ("unit_type", "room__property", "room", "is_active")  # noqa
+    search_fields = ("name", "room__name", "room__property__name")
     date_hierarchy = "created_at"
-    ordering = ("room__property", "room", "name")  # Ordenar primero por property de la room
+    ordering = ("room__property", "room", "name")
     fieldsets = (
         (None, {"fields": ("name", "unit_type", "room", "is_active")}),  # noqa
     )
     readonly_fields = ("created_at", "updated_at")
-    
-    # Filtro jerárquico que muestra primero las propiedades y luego las habitaciones de la propiedad seleccionada
+
+    # Filtro jerárquico que muestra primero las propiedades y
+    # luego las habitaciones de la propiedad seleccionada
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "room":
             kwargs["queryset"] = Room.objects.select_related("property").all()
@@ -96,10 +97,10 @@ class PlanAdmin(admin.ModelAdmin):
         "is_active",
         "created_at",
     )  # noqa
-    list_filter = ("room__property", "room", "is_active")  # Filtrar por property de la room
-    search_fields = ("name", "room__name", "room__property__name")  # Búsqueda por property
+    list_filter = ("room__property", "room", "is_active")
+    search_fields = ("name", "room__name", "room__property__name")
     date_hierarchy = "created_at"
-    ordering = ("room__property", "room", "name")  # Ordenar primero por property de la room
+    ordering = ("room__property", "room", "name")
     fieldsets = (
         (
             None,
@@ -117,8 +118,9 @@ class PlanAdmin(admin.ModelAdmin):
         ),  # noqa
     )
     readonly_fields = ("created_at", "updated_at")
-    
-    # Filtro jerárquico que muestra primero las propiedades y luego las habitaciones de la propiedad seleccionada
+
+    # Filtro jerárquico que muestra primero las propiedades y
+    # luego las habitaciones de la propiedad seleccionada
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "room":
             kwargs["queryset"] = Room.objects.select_related("property").all()
