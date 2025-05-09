@@ -1,7 +1,7 @@
 django==5.1.6
 virtualenv==20.29.1
 psycopg2==2.9.10
-djangorestframework==3.13.1
+djangorestframework==3.16.0
 markdown==3.7
 django-filter==22.1
 gunicorn==23.0.0
