@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 import os
+from django.utils.timezone import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -44,6 +45,8 @@ INSTALLED_APPS = [
     "payments",
     "accounts",
     "axes",
+    'rest_framework',
+    'knox',
 ]
 
 MIDDLEWARE = [
@@ -55,7 +58,20 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "axes.middleware.AxesMiddleware",
+    "django.contrib.auth.middleware.LoginRequiredMiddleware",
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'knox.auth.TokenAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+}
+
+REST_KNOX = {
+	'TOKEN_TTL':timedelta(hours=12),
+	'TOKEN_LIMIT_PER_USER':100, # por defecto 100
+}
 
 ROOT_URLCONF = "pms.urls"
 
