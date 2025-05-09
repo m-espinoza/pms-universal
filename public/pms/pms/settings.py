@@ -11,8 +11,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 import os
-from django.utils.timezone import timedelta
 from pathlib import Path
+
+from django.utils.timezone import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -45,8 +46,8 @@ INSTALLED_APPS = [
     "payments",
     "accounts",
     "axes",
-    'rest_framework',
-    'knox',
+    "rest_framework",
+    "knox",
 ]
 
 MIDDLEWARE = [
@@ -62,15 +63,15 @@ MIDDLEWARE = [
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'knox.auth.TokenAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "knox.auth.TokenAuthentication",
+        "rest_framework.authentication.BasicAuthentication",
     ),
 }
 
 REST_KNOX = {
-	'TOKEN_TTL':timedelta(hours=12),
-	'TOKEN_LIMIT_PER_USER':100, # por defecto 100
+    "TOKEN_TTL": timedelta(hours=12),
+    "TOKEN_LIMIT_PER_USER": 100,  # por defecto 100
 }
 
 ROOT_URLCONF = "pms.urls"
